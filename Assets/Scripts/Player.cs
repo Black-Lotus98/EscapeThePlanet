@@ -11,10 +11,11 @@ public class Player : MonoBehaviour
     [SerializeField] AudioSource AS;
     [SerializeField] AudioSource CollectableAS;
 
-
+    // The fuel bar is relying on the observer pattern to be updated on the UI 
+    // as a result we don't need to reference the UI element in the scene editor
     [Header("Fuel Settings")]
-    [SerializeField] bool UseFuel = false;
-    [SerializeField] Slider FuelSlider;
+    [SerializeField] bool useFuel = false;
+    // [SerializeField] Slider FuelSlider;
     [SerializeField] float FuelCounter;
     [SerializeField] float MaxFlightTime = 0;
     [SerializeField] AudioClip FuelBarrelCollectableSound;
@@ -22,17 +23,31 @@ public class Player : MonoBehaviour
 
 
     [Header("Shield Settings")]
-    [SerializeField] bool ShieldCanBeUsed = false;
+    [SerializeField] bool shieldCanBeUsed = false;
+    public bool ShieldCanBeUsed
+    {
+        get
+        {
+            return shieldCanBeUsed;
+        }
+        set
+        {
+            if (shieldCanBeUsed != value)
+            {
+                shieldCanBeUsed = value;
+                NotifyObservers(PlayerState.ShieldChanged);
+                NotifyObservers(PlayerState.FuelChanged);
+            }
+        }
+    }
+
     [SerializeField] GameObject Shield;
     [SerializeField] AudioClip ShieldActivationSound;
     [SerializeField] float ShieldMaxTime;
     [SerializeField] float CurrentShieldTime;
-    [SerializeField] Slider ShieldSlider;
-    [SerializeField] TextMeshProUGUI ShieldText;
-    bool shieldIsActive;
-
-
-
+    // [SerializeField] Slider ShieldSlider;
+    // [SerializeField] TextMeshProUGUI ShieldText;
+    bool shieldIsActive = false;
 
 
     [Header("Other Settings")]
@@ -46,6 +61,17 @@ public class Player : MonoBehaviour
     [SerializeField] bool playerHasKey = false;
 
 
+    // The enums are used to prevent the observer from 
+    // being notified whenever the state of the shield or fuel changes
+    // so the enum will be used to check the state of the shield and fuel independently
+    // To access the state of the shield and fuel use in the observers I must use Player.PlayerState.ENUMVALUE
+    // For example: Player.PlayerState.ShieldChanged or Player.PlayerState.FuelChanged
+    public enum PlayerState
+    {
+        FuelChanged,
+        ShieldChanged,
+    }
+
     private List<IPlayerObserver> observers = new List<IPlayerObserver>();
 
     public void AddObserver(IPlayerObserver observer)
@@ -58,18 +84,19 @@ public class Player : MonoBehaviour
         observers.Remove(observer);
     }
 
-    private void NotifyObservers()
+    public void NotifyObservers(PlayerState state)
     {
         foreach (IPlayerObserver observer in observers)
         {
-            observer.OnPlayerStateChange(this);
+            observer.OnPlayerStateChange(this, state);
         }
     }
 
-    public void ExecutePowerUp(IPowerUpStrategy powerUpStrategy)
+    public void ExecutePowerUp(ICollectibleBehavior collectableBehaviour)
     {
-        powerUpStrategy.ExecutePowerUp(this);
-        NotifyObservers();
+        collectableBehaviour.ExecutePowerUp(this);
+        NotifyObservers(PlayerState.ShieldChanged);
+        NotifyObservers(PlayerState.FuelChanged);
     }
 
 
@@ -77,16 +104,11 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        UpdateShieldUi();
+        NotifyObservers(PlayerState.ShieldChanged);
+        NotifyObservers(PlayerState.FuelChanged);
+        // UpdateShieldUi();
     }
 
-    void UpdateShieldUi()
-    {
-        ShieldSlider.maxValue = ShieldMaxTime;
-        ShieldSlider.value = CurrentShieldTime;
-
-        ShieldText.text = (Mathf.Round(CurrentShieldTime * 100.00f) * 0.01f).ToString() + "/" + ShieldMaxTime.ToString();
-    }
 
     void Update()
     {
@@ -113,11 +135,13 @@ public class Player : MonoBehaviour
                 if (!Shield.activeInHierarchy)
                 {
                     Shield.SetActive(true);
+                    shieldIsActive = true;
                     AS.PlayOneShot(ShieldActivationSound);
 
                 }
                 else
                 {
+                    shieldIsActive = false;
                     AS.Stop();
                     Shield.SetActive(false);
                 }
@@ -136,16 +160,16 @@ public class Player : MonoBehaviour
             if (CurrentShieldTime > 0.0f)
             {
                 CurrentShieldTime -= Time.deltaTime;
-                UpdateShieldUi();
-
+                NotifyObservers(PlayerState.ShieldChanged);
             }
             else
             {
                 AS.Stop();
                 CurrentShieldTime = 0.0f;
-                UpdateShieldUi();
                 ShieldCanBeUsed = false;
+                NotifyObservers(PlayerState.ShieldChanged);
             }
+
         }
     }
 
@@ -153,7 +177,7 @@ public class Player : MonoBehaviour
     {
         CollectableAS.PlayOneShot(FuelBarrelCollectableSound);
         CurrentShieldTime += amount;
-        UpdateShieldUi();
+        NotifyObservers(PlayerState.ShieldChanged);
         ShieldCanBeUsed = true;
     }
 
@@ -167,24 +191,22 @@ public class Player : MonoBehaviour
     }
 
 
-    public void UpdateFuelUi()
-    {
-        FuelSlider.maxValue = MaxFlightTime;
-        FuelSlider.value = FuelCounter;
-    }
 
 
     public void FuelUsage(float amount)
     {
-        if (FuelCounter > MaxFlightTime)
+        if (useFuel)
         {
-            FuelCounter = MaxFlightTime;
+            if (FuelCounter > MaxFlightTime)
+            {
+                FuelCounter = MaxFlightTime;
+            }
+            else
+            {
+                FuelCounter += amount * Time.deltaTime;
+            }
+            NotifyObservers(PlayerState.FuelChanged);
         }
-        else
-        {
-            FuelCounter += amount * Time.deltaTime;
-        }
-        UpdateFuelUi();
     }
 
 
@@ -200,23 +222,26 @@ public class Player : MonoBehaviour
             FuelCounter += amount;
 
         }
-        NotifyObservers();
+        NotifyObservers(PlayerState.FuelChanged);
     }
 
-    public bool GetUsingFuelStatus()
+    public bool GetIsUsingFuel()
     {
-        return this.UseFuel;
+        return this.useFuel;
     }
 
+    public bool GetIsUsingShield()
+    {
+        return this.shieldIsActive;
+    }
+
+    // This method is to stop the IShieldObserver form Executing the commands
     public float GetFuelCounter()
     {
         return this.FuelCounter;
     }
 
-    public void SetFuelCounter(float amount)
-    {
-        this.FuelCounter = amount;
-    }
+
     public float GetMaxFlightTime()
     {
         return this.MaxFlightTime;
@@ -267,4 +292,28 @@ public class Player : MonoBehaviour
         UpdateKeyGUI();
         playerHasKey = status;
     }
+
+
+    // Unused methods
+    // this method is no longer needed because of the observer pattern
+    // public void UpdateFuelUi()
+    // {
+    //     FuelSlider.maxValue = MaxFlightTime;
+    //     FuelSlider.value = FuelCounter;
+    //     NotifyObservers();
+    // }
+
+    // public void SetFuelCounter(float amount)
+    // {
+    //     this.FuelCounter = amount;
+    // }
+
+    // void UpdateShieldUi()
+    // {
+    //     ShieldSlider.maxValue = ShieldMaxTime;
+    //     ShieldSlider.value = CurrentShieldTime;
+
+    //     ShieldText.text = (Mathf.Round(CurrentShieldTime * 100.00f) * 0.01f).ToString() + "/" + ShieldMaxTime.ToString();
+    // }
+
 }

@@ -11,7 +11,7 @@ public class TutorialManager : MonoBehaviour
     private void Start()
     {
         TutorialPlane.SetActive(true);
-        GameObject.FindGameObjectWithTag("Player").GetComponent<MobileController>().enabled = false;
+        GameObject.FindGameObjectWithTag("Player").GetComponent<InputHandler>().enabled = false;
     }
 }
 

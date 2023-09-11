@@ -1,3 +1,5 @@
+// This script is no longer used
+// I switched to the strategy pattern
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IPlayerObserver
 {
-    void OnPlayerStateChange(Player player);
+    void OnPlayerStateChange(Player player, Player.PlayerState state);
 }

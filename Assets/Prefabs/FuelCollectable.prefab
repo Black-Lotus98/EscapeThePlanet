@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 175613232972246520}
   - component: {fileID: 175613232972246521}
   - component: {fileID: 175613232972246526}
-  - component: {fileID: 175613232972246468}
   - component: {fileID: 175613232972246471}
+  - component: {fileID: 601078460}
   m_Layer: 0
   m_Name: FuelCollectable
   m_TagString: FuelBarrel
@@ -33,6 +33,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -48, y: 0, z: -3}
   m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 171649926567206094}
   m_Father: {fileID: 0}
@@ -57,6 +58,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -130,20 +132,6 @@ MonoBehaviour:
   movementsFactor: 0
   period: 5
   fullcycles: 1
---- !u!114 &175613232972246468
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 175613232972246527}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 009c7d3ea30af7945bcfa0d0e6d5cbbf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ExplosionEffect: {fileID: 1855340746554395459, guid: 49011e57640af4346b984abcfb1cf581, type: 3}
-  amount: 5
 --- !u!82 &175613232972246471
 AudioSource:
   m_ObjectHideFlags: 0
@@ -240,6 +228,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &601078460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175613232972246527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e004245f5379c945ae11a1f27a1c1fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplosionEffect: {fileID: 1855340746554395459, guid: 49011e57640af4346b984abcfb1cf581, type: 3}
+  amount: 5
 --- !u!1001 &175613233013820030
 PrefabInstance:
   m_ObjectHideFlags: 0

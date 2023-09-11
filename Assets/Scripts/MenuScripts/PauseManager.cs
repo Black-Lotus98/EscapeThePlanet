@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class PauseManager : MonoBehaviour
 {
     public bool IsPaused;
+
     public GameObject PauseMenuObj;
     public GameObject HowToPlayPanel;
     bool toggle = true;
@@ -17,7 +18,10 @@ public class PauseManager : MonoBehaviour
 
     private void Start()
     {
-        Unpause();
+        if (SceneManager.GetActiveScene().name != "MainMenu")
+        {
+            Unpause();
+        }
     }
 
     public void ExitToMainMenu()

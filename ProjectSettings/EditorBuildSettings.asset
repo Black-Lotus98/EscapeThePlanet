@@ -56,6 +56,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tutorials/Tutorial04.unity
     guid: dba557f8a76eddc4ab3a41f41ec06f0f
+  - enabled: 1
+    path: Assets/Scenes/TestingScene.unity
+    guid: 9e3c9bf596ea3fa43b55a5729eb61b1d
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 633c45ff3e0c14e449592d7c9b8e6936, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 9ab127163c19fe0479c83c47b2d80b48, type: 2}

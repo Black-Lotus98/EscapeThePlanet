@@ -7,15 +7,8 @@ using UnityEngine.SceneManagement;
 
 public class LevelSelector : MonoBehaviour
 {
-    public Button[] levelButtons;
+    [SerializeField] Button[] levelButtons;
 
-
-
-    public void LoadLevel(string lvlName)
-    {
-        SceneManager.LoadScene(lvlName);
-    }
-    
     void Start()
     {
         int levelReached = PlayerPrefs.GetInt("levelReached", 1);
@@ -28,4 +21,10 @@ public class LevelSelector : MonoBehaviour
             }
         }
     }
+
+    public void LoadLevel(string lvlName)
+    {
+        SceneManager.LoadScene(lvlName);
+    }
+
 }

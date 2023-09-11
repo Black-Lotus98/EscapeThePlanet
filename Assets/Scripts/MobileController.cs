@@ -1,3 +1,5 @@
+// This script is no longer used
+// I switched to the command pattern
 using UnityStandardAssets.CrossPlatformInput;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,7 +27,6 @@ public class MobileController : MonoBehaviour
     void Start()
     {
         player = gameObject.GetComponent<Player>();
-        player.UpdateFuelUi();
         rigidbdy = GetComponent<Rigidbody>();
         AS = GetComponent<AudioSource>();
     }
@@ -43,7 +44,7 @@ public class MobileController : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow) || CrossPlatformInputManager.GetButton("Thrust"))
         {
             StartThrusting();
-            if (player.GetUsingFuelStatus())
+            if (player.GetIsUsingFuel())
             {
 
                 if (player.GetFuelCounter() > 0)
@@ -52,7 +53,6 @@ public class MobileController : MonoBehaviour
                 }
                 else
                 {
-                    player.SetFuelCounter(0);
                     this.enabled = false;
                     StopThrusting();
                 }

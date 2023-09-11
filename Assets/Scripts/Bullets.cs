@@ -8,7 +8,8 @@ public class Bullets : MonoBehaviour
     [SerializeField] GameObject BulletHitEffect;
     void OnCollisionEnter(Collision other)
     {
-        Instantiate(BulletHitEffect,transform.position, Quaternion.identity);
+        var effect = Instantiate(BulletHitEffect,transform.position, Quaternion.identity);
+        Destroy(effect);
         Destroy(gameObject);
     }  
 }

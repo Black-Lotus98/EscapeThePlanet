@@ -23,10 +23,10 @@ public class InputHandler : MonoBehaviour
     private void Awake()
     {
         invoker = new Invoker();
-
+        Player player = FindObjectOfType<Player>();
         movementController = FindObjectOfType<MovementController>();
 
-        this.moveUpCommand = new MoveUp(movementSpeed, mainEngine, rocketBoostParticles);
+        this.moveUpCommand = new MoveUp(movementSpeed, mainEngine, rocketBoostParticles, player);
         this.rotateLeftCommand = new RotateLeft(rotationSpeed, leftThrustParticles);
         this.rotateRightCommand = new RotateRight(rotationSpeed, rightThrustParticles);
         this.stopThrustCommand = new StopThrust(mainEngine, rocketBoostParticles);
@@ -36,12 +36,15 @@ public class InputHandler : MonoBehaviour
 
     private void Update()
     {
-
-        var gameManager = FindObjectOfType<GameManager>();
-        if (gameManager.LevelIsOver)
+        // This if statement is for the tutorial levels, as it fix the issue where the controller gets stuck and stop functioning
+        if (FindObjectOfType<TutorialManager>() == null)
         {
-            this.enabled = false;
-            return;
+            var gameManager = FindObjectOfType<GameManager>();
+            if (gameManager.LevelIsOver)
+            {
+                this.enabled = false;
+                return;
+            }
         }
 
 

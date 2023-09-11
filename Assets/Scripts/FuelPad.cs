@@ -38,7 +38,7 @@ public class FuelPad : MonoBehaviour
                     else if (player.GetFuelCounter() > 60)
                     {
                         AS.Stop();
-                        player.SetFuelCounter(60);
+                        // player.SetFuelCounter(60);
                     }
                 }
                 else
