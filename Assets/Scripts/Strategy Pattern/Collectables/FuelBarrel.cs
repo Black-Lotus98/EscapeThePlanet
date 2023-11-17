@@ -1,5 +1,5 @@
 using UnityEngine;
-public class FuelBarrel : Collectable
+public class FuelBarrel : Collectable<FuelManager>
 {
 
     [SerializeField] int amount;
@@ -8,8 +8,12 @@ public class FuelBarrel : Collectable
         collectibleBehavior = new FuelBarrelCollectible(amount);
     }
 
-    protected override void Collect(Player player)
+    // protected override void Collect(Player player)
+    // {
+    //     collectibleBehavior.ExecutePowerUp(player);
+    // }
+    protected override void Collect(FuelManager fuelManager)
     {
-        collectibleBehavior.ExecutePowerUp(player);
+        collectibleBehavior.ExecutePowerUp(fuelManager);
     }
 }

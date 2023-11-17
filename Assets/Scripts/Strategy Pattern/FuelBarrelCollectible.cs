@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FuelBarrelCollectible : ICollectibleBehavior
+public class FuelBarrelCollectible : ICollectibleBehavior<FuelManager>
 {
     private int amount;
 
@@ -12,11 +12,19 @@ public class FuelBarrelCollectible : ICollectibleBehavior
         this.amount = amount;
     }
 
-    public void ExecutePowerUp(Player player)
+    // public void ExecutePowerUp(Player player)
+    // {
+    //     if (player.GetFuelCounter() < player.GetMaxFlightTime())
+    //     {
+    //         player.FuelBarrel(amount);
+    //     }
+    // }
+    public void ExecutePowerUp(FuelManager fuelManager)
     {
-        if (player.GetFuelCounter() < player.GetMaxFlightTime())
+        Debug.Log($"fuelManager.FuelCounter " + fuelManager.FuelAmount);
+        if (fuelManager.FuelAmount < fuelManager.MaxFlightTime)
         {
-            player.FuelBarrel(amount);
+            fuelManager.FuelBarrel(amount);
         }
     }
 }

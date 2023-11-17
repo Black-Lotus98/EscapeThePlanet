@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 24124c1355550f54084e3ebc38bc7f20
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - AS: {instanceID: 0}
+  - CollectableAS: {instanceID: 0}
+  - saveDataManager: {instanceID: 0}
+  - shield: {instanceID: 0}
+  - shieldActivationSound: {fileID: 8300000, guid: d7ac6a681e20de146aff6f1b3078523e, type: 3}
+  - shieldCollectableSound: {fileID: 8300000, guid: ec5d18b25a40fc64f8903d0c634c34d2, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -7,9 +7,10 @@ public class InputHandler : MonoBehaviour
 {
     public MovementController movementController;
 
-    private Command moveUpCommand, rotateLeftCommand, rotateRightCommand, stopThrustCommand, stopRotationCommand;
+    private Command moveUpCommand, rotateLeftCommand, rotateRightCommand, stopThrustCommand, stopRotationCommand, toggleShieldCommand;
 
     [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip shieldActivationSound;
 
     [SerializeField] float movementSpeed = 1000f;
     [SerializeField] float rotationSpeed = 1f;
@@ -23,14 +24,16 @@ public class InputHandler : MonoBehaviour
     private void Awake()
     {
         invoker = new Invoker();
-        Player player = FindObjectOfType<Player>();
+        FuelManager fuelManager = FindObjectOfType<FuelManager>();
+        ShieldManager shieldManager = FindObjectOfType<ShieldManager>();
         movementController = FindObjectOfType<MovementController>();
 
-        this.moveUpCommand = new MoveUp(movementSpeed, mainEngine, rocketBoostParticles, player);
+        this.moveUpCommand = new MoveUp(movementSpeed, mainEngine, rocketBoostParticles, fuelManager);
         this.rotateLeftCommand = new RotateLeft(rotationSpeed, leftThrustParticles);
         this.rotateRightCommand = new RotateRight(rotationSpeed, rightThrustParticles);
         this.stopThrustCommand = new StopThrust(mainEngine, rocketBoostParticles);
         this.stopRotationCommand = new StopRotation(leftThrustParticles, rightThrustParticles);
+        this.toggleShieldCommand = new ToggleShield(shieldManager, shieldActivationSound);
     }
 
 
@@ -61,7 +64,6 @@ public class InputHandler : MonoBehaviour
         {
             invoker.ExecuteCommand(stopThrustCommand, movementController.Rigidbdy, movementController.AS);
         }
-
         if (Input.GetKey(KeyCode.A) || CrossPlatformInputManager.GetButton("Left"))
         {
             invoker.ExecuteCommand(rotateLeftCommand, movementController.Rigidbdy, movementController.AS);
@@ -73,6 +75,10 @@ public class InputHandler : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.D) || CrossPlatformInputManager.GetButtonUp("Right") || Input.GetKeyUp(KeyCode.A) || CrossPlatformInputManager.GetButtonUp("Left"))
         {
             invoker.ExecuteCommand(stopRotationCommand, movementController.Rigidbdy, movementController.AS);
+        }
+        if (Input.GetKeyDown(KeyCode.E) || CrossPlatformInputManager.GetButtonDown("Shield"))
+        {
+            invoker.ExecuteCommand(toggleShieldCommand, movementController.Rigidbdy, movementController.AS);
         }
     }
 }

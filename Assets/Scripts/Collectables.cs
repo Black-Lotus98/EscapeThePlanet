@@ -41,18 +41,18 @@ public class Collectables : MonoBehaviour
             }
 
 
-            if (gameObject.tag == "StarCollectable")
-            {
-                int CollectedStar = player.GetCollectedStarsCounter();
+            // if (gameObject.tag == "StarCollectable")
+            // {
+            //     int CollectedStar = player.GetStarCount();
 
-                if (player.GetStarStatus(CollectedStar))
-                {
-                    player.UpdateStarsGUI();
-                    Instantiate(ExplosionEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
-                    player.SetCollectedStarsCounter(amount);
-                    Destroy(gameObject);
-                }
-            }
+            //     if (player.GetStarStatus(CollectedStar))
+            //     {
+            //         player.UpdateStarsGUI();
+            //         Instantiate(ExplosionEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+            //         player.SetCollectedStarsCounter(amount);
+            //         Destroy(gameObject);
+            //     }
+            // }
 
         }
 

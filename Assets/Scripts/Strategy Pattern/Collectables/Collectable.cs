@@ -4,26 +4,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Collectable : MonoBehaviour
+public abstract class Collectable<T> : MonoBehaviour where T : UIManager
 {
     [SerializeField] protected ParticleSystem ExplosionEffect;
 
     // This is a part of the strategy pattern, it will be used to determine the type of collectable
-    protected ICollectibleBehavior collectibleBehavior;
+    protected ICollectibleBehavior<T> collectibleBehavior;
 
     private void OnTriggerEnter(Collider other)
     {
-        var player = other.GetComponent<Player>();
+        var manager = other.GetComponent<T>();
 
-        if (player != null)
+        if (manager != null)
         {
-            Collect(player);
+            Collect(manager);
 
             Instantiate(ExplosionEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
             Destroy(gameObject);
         }
     }
 
-    protected abstract void Collect(Player player);
+    protected abstract void Collect(T manager);
 }
 

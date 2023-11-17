@@ -8,22 +8,28 @@ public class MoveUp : Command
     private AudioClip mainEngine;
     private ParticleSystem rocketBoostParticles;
 
-    private Player player;
+    private FuelManager fuelManager;
 
-    public MoveUp(float movementSpeed, AudioClip mainEngine, ParticleSystem rocketBoostParticles, Player player)
+    public MoveUp(float movementSpeed, AudioClip mainEngine, ParticleSystem rocketBoostParticles, FuelManager fuelManager)
     {
         this.movementSpeed = movementSpeed;
         this.mainEngine = mainEngine;
         this.rocketBoostParticles = rocketBoostParticles;
-        this.player = player;
+        this.fuelManager = fuelManager;
     }
 
     public override void Execute(Rigidbody rigidbody, AudioSource audioSource)
     {
-        if (player.GetIsUsingFuel())
+        if (fuelManager.IsUsingFuel)
         {
-            player.FuelUsage(-1);
-            player.NotifyObservers(Player.PlayerState.FuelChanged);
+            if (fuelManager.FuelAmount <= 0)
+            {
+                fuelManager.FuelAmount = 0;
+                audioSource.Stop();
+                return;
+            }
+            fuelManager.FuelConsumption(-1);
+            fuelManager.NotifyObservers(UIState.FuelChanged);
         }
         rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed);
 

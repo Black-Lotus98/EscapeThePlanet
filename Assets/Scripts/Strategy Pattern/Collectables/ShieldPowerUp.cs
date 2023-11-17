@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ShieldPowerUp : Collectable
+public class ShieldPowerUp : Collectable<ShieldManager>
 {
     [SerializeField] int amount;
     private void Start()
@@ -8,8 +8,8 @@ public class ShieldPowerUp : Collectable
         collectibleBehavior = new ShieldPowerUpCollectible(amount);
     }
 
-    protected override void Collect(Player player)
+    protected override void Collect(ShieldManager shieldManager)
     {
-        collectibleBehavior.ExecutePowerUp(player);
+        collectibleBehavior.ExecutePowerUp(shieldManager);
     }
 }

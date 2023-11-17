@@ -560,7 +560,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       propertyPath: m_Name
-      value: AtomRocket
+      value: Player ship
       objectReference: {fileID: 0}
     - target: {fileID: 100012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       propertyPath: m_IsActive
@@ -588,15 +588,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -27.6
+      value: 59
       objectReference: {fileID: 0}
     - target: {fileID: 400012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 51.73107
       objectReference: {fileID: 0}
     - target: {fileID: 400012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -139
       objectReference: {fileID: 0}
     - target: {fileID: 400012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       propertyPath: m_LocalRotation.w
@@ -989,7 +989,7 @@ MonoBehaviour:
   RocketBoostParticles: {fileID: 2004535230780235060}
   leftThrustParticles: {fileID: 6024128677100268927}
   RightThrustParticles: {fileID: 8636924120726806324}
---- !u!114 &2046309907
+--- !u!114 &1546177322
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -998,29 +998,74 @@ MonoBehaviour:
   m_GameObject: {fileID: 3448052657569951258}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e5bebdc842821b4583087d3af706675, type: 3}
+  m_Script: {fileID: 11500000, guid: 996e7986a0210384c95b6f1b9b9d20f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   AS: {fileID: 0}
   CollectableAS: {fileID: 0}
-  UseFuel: 0
-  FuelSlider: {fileID: 0}
-  FuelCounter: 30
-  MaxFlightTime: 60
-  FuelBarrelCollectableSound: {fileID: 8300000, guid: ec5d18b25a40fc64f8903d0c634c34d2, type: 3}
-  ShieldCanBeUsed: 0
-  Shield: {fileID: 1253470318}
-  ShieldActivationSound: {fileID: 8300000, guid: d7ac6a681e20de146aff6f1b3078523e, type: 3}
-  ShieldMaxTime: 30
-  CurrentShieldTime: 10
-  ShieldSlider: {fileID: 0}
-  ShieldText: {fileID: 0}
-  Stars: []
-  CollectedStar: {fileID: 0}
-  UncollectedStar: {fileID: 0}
-  Key: {fileID: 0}
-  CollectedKey: {fileID: 0}
+  saveDataManager: {fileID: 0}
+  inputHandler: {fileID: 1557862241}
+  starCollectableSound: {fileID: 8300000, guid: ec5d18b25a40fc64f8903d0c634c34d2, type: 3}
+--- !u!114 &1546177323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448052657569951258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df339ea378f07104d801078d11d2bb9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AS: {fileID: 0}
+  CollectableAS: {fileID: 0}
+  saveDataManager: {fileID: 0}
+  inputHandler: {fileID: 1557862241}
   playerHasKey: 0
+  keyCollectableSound: {fileID: 8300000, guid: ec5d18b25a40fc64f8903d0c634c34d2, type: 3}
+--- !u!114 &1546177324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448052657569951258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccd264b5fef46f64e91640cc3c5656f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AS: {fileID: 0}
+  CollectableAS: {fileID: 0}
+  saveDataManager: {fileID: 0}
+  inputHandler: {fileID: 1557862241}
+  isUsingFuel: 1
+  fuelAmount: 30
+  maxFlightTime: 60
+  fuelCollectableSound: {fileID: 8300000, guid: ec5d18b25a40fc64f8903d0c634c34d2, type: 3}
+--- !u!114 &1546177325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448052657569951258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24124c1355550f54084e3ebc38bc7f20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AS: {fileID: 0}
+  CollectableAS: {fileID: 0}
+  saveDataManager: {fileID: 0}
+  inputHandler: {fileID: 1557862241}
+  shieldAllowed: 1
+  shield: {fileID: 1253470318}
+  shieldActivationSound: {fileID: 8300000, guid: d7ac6a681e20de146aff6f1b3078523e, type: 3}
+  shieldCollectableSound: {fileID: 8300000, guid: ec5d18b25a40fc64f8903d0c634c34d2, type: 3}
+  shieldMaxTime: 30
+  currentShieldTime: 10
 --- !u!114 &1557862240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1047,11 +1092,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementController: {fileID: 1557862240}
   mainEngine: {fileID: 8300000, guid: 30cbb8a386e66fc45bec753eb2599b46, type: 3}
+  shieldActivationSound: {fileID: 0}
   movementSpeed: 700
   rotationSpeed: 80
   rocketBoostParticles: {fileID: 2004535230780235060}
   leftThrustParticles: {fileID: 6024128677100268927}
   rightThrustParticles: {fileID: 8636924120726806324}
+--- !u!114 &2046309907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448052657569951258}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5bebdc842821b4583087d3af706675, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AS: {fileID: 0}
+  CollectableAS: {fileID: 0}
+  useFuel: 1
+  FuelCounter: 30
+  MaxFlightTime: 60
+  FuelBarrelCollectableSound: {fileID: 8300000, guid: ec5d18b25a40fc64f8903d0c634c34d2, type: 3}
+  shieldCanBeUsed: 0
+  Shield: {fileID: 1253470318}
+  ShieldActivationSound: {fileID: 8300000, guid: d7ac6a681e20de146aff6f1b3078523e, type: 3}
+  ShieldMaxTime: 30
+  CurrentShieldTime: 10
+  playerHasKey: 0
+  StarsCollected: 0
+  shieldManager: {fileID: 0}
 --- !u!1 &3448052657569951260 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100010, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}

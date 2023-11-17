@@ -1,11 +1,12 @@
+using System.Data.Common;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class CollisionHandler : MonoBehaviour
 {
-    public GameManager gameManager;
 
-    static int numberOfDeaths = 0;
+    [SerializeField] GameManager gameManager;
     [SerializeField] float delayTime = 1f;
     [SerializeField] AudioClip Explosion;
     [SerializeField] AudioClip Finish;
@@ -15,6 +16,8 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] bool isTutorial = false;
     [SerializeField] GameObject FinishTutorialPlane;
 
+    SaveDataManager SaveManager;
+
 
     AudioSource AS;
 
@@ -22,59 +25,118 @@ public class CollisionHandler : MonoBehaviour
     bool isTransitioning = false;
     bool CollisionDisabled = false;
 
+    static int numberOfDeaths = 0;
+
+    // private CollisionState currentState;
+
     void Start()
     {
+        // Finding the SaveDataManager
+        SaveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+
+        // Loading the data from the SaveDataManager
+        GameData gameData = SaveManager.Load();
+        // Getting the current level data from the game data
+        // LevelData currentLevelData = GetLevelData(gameData);
+
+        var currentSceneData = SceneManager.GetActiveScene();
+        if (!gameData.levelData.Where(x => x.currentLevelName == currentSceneData.name).Any())
+        {
+            gameData.levelData.Add(new LevelData(currentSceneData.name, currentSceneData.buildIndex, 0, 0));
+        }
+
+        if (gameData.lastLevelReached < SceneManager.GetActiveScene().buildIndex)
+        {
+            gameData.lastLevelReached = SceneManager.GetActiveScene().buildIndex;
+        }
+
+
+        SaveManager.Save(gameData);
+
         AS = GetComponent<AudioSource>();
 
         //Load the data to check if the game is restarted or not
         LoadData();
         //Then the data is saved again to keep it on track
         SaveProgress();
-
     }
 
-    void Update()
-    {
-        // ActivateController();
-        //Cheatkeys();
-    }
+    // void Update()
+    // {
+    //     ActivateController();
+    //     CheatKeys();
+    // }
+
     void OnCollisionEnter(Collision other)
     {
         if (isTransitioning || CollisionDisabled)
         {
             return;
         }
-        switch (other.gameObject.tag)
+
+        CollisionState state = other.gameObject.GetComponent<CollisionState>();
+        if (state != null)
         {
-            case "Start":
-                //Debug.Log("You hit the lanch padl");
-                break;
-            case "FuelPad":
-                //Debug.Log("You hit the Fuel pad");
-                break;
-            case "Finish":
-                StartSuccessSequence();
-                break;
-            default:
-                StartCrashSequence();
-                break;
+            state.Handle(this);
         }
+        else
+        {
+            Debug.Log($"{other.gameObject.name} has no CollisionState");
+            StartCrashSequence();
+        }
+
+        // the switch statement is not needed since we have a CollisionState that being attached to game objects
+        // switch (other.gameObject.tag)
+        // {
+        //     case "Start":
+        //         currentState = new StartState();
+        //         // Debug.Log("You hit the Start pad, I am in collision handler");
+        //         break;
+        //     case "FuelPad":
+        //         //Debug.Log("You hit the Fuel pad");
+        //         currentState = new FuelPadState();
+        //         break;
+        //     case "Finish":
+        //         StartSuccessSequence();
+        //         break;
+        //     default:
+        //         StartCrashSequence();
+        //         break;
+        // }
+        // currentState.Handle(this);
+
     }
 
-    void StartCrashSequence()
+    public void StartCrashSequence()
     {
+
         isTransitioning = true;
         AS.Stop();
         AS.PlayOneShot(Explosion);
         ExplosionParticles.Play();
         GetComponent<InputHandler>().enabled = false;
         numberOfDeaths++;
+        UpdateDataOnLosing();
         SaveProgress();
         Invoke("ReloadLevel", delayTime);
     }
 
-    void StartSuccessSequence()
+    public void StartSuccessSequence()
     {
+        GameData gameData = SaveManager.Load();
+        LevelData currentLevelData = GetLevelData(gameData);
+        int currentCollectedStars = SaveManager.GetCollectedStars();
+        if (SaveManager.TempCollectedStars >= currentCollectedStars)
+        {
+            currentLevelData.collectedStars = SaveManager.TempCollectedStars;
+        }
+        else
+        {
+            currentLevelData.collectedStars = currentCollectedStars;
+        }
+        
+        SaveManager.ResetCollectedStars();
+        SaveManager.ResetTempCollectedStars();
         isTransitioning = true;
         AS.Stop();
         AS.PlayOneShot(Finish);
@@ -90,35 +152,17 @@ public class CollisionHandler : MonoBehaviour
             FinishTutorialPlane.SetActive(true);
             Invoke("loadTutorial", delayTime);
         }
+
+        SaveManager.Save(gameData);
+
     }
 
-
-    void LoadNextLevel()
+    public void ActivateCheckpoint()
     {
-        int CurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int NextSceneIndex = CurrentSceneIndex + 1;
-
-        string CurrentSceneName = SceneManager.GetSceneByBuildIndex(CurrentSceneIndex).name;
-
-        if ((NextSceneIndex == SceneManager.sceneCountInBuildSettings) || (CurrentSceneName == "LastLevel"))
-        {
-            NextSceneIndex = 0;
-        }
-        SceneManager.LoadScene(NextSceneIndex);
+        Debug.Log($"Checkpoint activated");
     }
 
-    void loadTutorial()
-    {
-        int CurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        if (CurrentSceneIndex + 1 < SceneManager.sceneCountInBuildSettings)
-        {
-            SceneManager.LoadScene(CurrentSceneIndex + 1);
-        }
-        else
-        {
-            SceneManager.LoadScene("MainMenu");
-        }
-    }
+
     void ReloadLevel()
     {
         int CurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
@@ -144,21 +188,49 @@ public class CollisionHandler : MonoBehaviour
         numberOfDeaths = data.NumberOfDeaths;
     }
 
-    // void ActivateController()
-    // {
-    //     if(GameObject.FindGameObjectWithTag("AnimatedCamera")==null && isTransitioning != true)
-    //     {
-    //         gameObject.GetComponent<MobileController>().enabled=true;
-    //     }
-    //     else
-    //     {
-    //         gameObject.GetComponent<MobileController>().enabled=false;
-    //     }
-    // }
+
+    void UpdateDataOnLosing()
+    {
+        GameData gameData = SaveManager.Load();
+        var currentLevelData = GetLevelData(gameData);
+        currentLevelData.numberOfDeaths++;
+        SaveManager.ResetTempCollectedStars();
+        gameData.totalNumberOfDeaths++;
+        SaveManager.Save(gameData);
+    }
+
+    // The method is used in the StartSuccessSequence method
+    void LoadNextLevel()
+    {
+        int CurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int NextSceneIndex = CurrentSceneIndex + 1;
+
+        string CurrentSceneName = SceneManager.GetSceneByBuildIndex(CurrentSceneIndex).name;
+
+        if ((NextSceneIndex == SceneManager.sceneCountInBuildSettings) || (CurrentSceneName == "LastLevel"))
+        {
+            NextSceneIndex = 0;
+        }
+        SceneManager.LoadScene(NextSceneIndex);
+    }
 
 
-    // //This method is used only if the game was built on PC platform
-    // void Cheatkeys()
+
+    LevelData GetLevelData(GameData gameData)
+    {
+        var sceneData = SceneManager.GetActiveScene();
+
+        // using .buildIndex to get the scene index and .name to get the scene name
+        var currentLevelData = gameData.levelData.Where(x => x.currentLevelIndex == sceneData.buildIndex).FirstOrDefault();
+        if (currentLevelData == null)
+        {
+            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex, 1, 0);
+        }
+        return currentLevelData;
+    }
+
+    // This method is used only on the PC platform
+    // void CheatKeys()
     // {
     //     if (Input.GetKeyDown(KeyCode.L))
     //     {
@@ -176,5 +248,29 @@ public class CollisionHandler : MonoBehaviour
 
     // }
 
+    // the LoadTutorial method was used to load the tutorial scene but the functionality was moved to the LevelSelector script
+    // void loadTutorial()
+    // {
+    //     int CurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+    //     if (CurrentSceneIndex + 1 < SceneManager.sceneCountInBuildSettings)
+    //     {
+    //         SceneManager.LoadScene(CurrentSceneIndex + 1);
+    //     }
+    //     else
+    //     {
+    //         SceneManager.LoadScene("MainMenu");
+    //     }
+    // }
 
+    // void ActivateController()
+    // {
+    //     if(GameObject.FindGameObjectWithTag("AnimatedCamera")==null && isTransitioning != true)
+    //     {
+    //         gameObject.GetComponent<MobileController>().enabled=true;
+    //     }
+    //     else
+    //     {
+    //         gameObject.GetComponent<MobileController>().enabled=false;
+    //     }
+    // }
 }

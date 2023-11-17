@@ -13,11 +13,11 @@ public class StarSoundTrigger : MonoBehaviour
 
     void Update()
     {
-        if(StarCollectable ==null)
+        if (StarCollectable == null)
         {
             Destroy(gameObject);
         }
     }
 
-    
+
 }

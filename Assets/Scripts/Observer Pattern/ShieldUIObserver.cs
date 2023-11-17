@@ -6,19 +6,20 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class ShieldUIObserver : MonoBehaviour, IPlayerObserver
+public class ShieldUIObserver : MonoBehaviour,  IUIObserver<ShieldManager>
 {
-    private Player player;
+    private ShieldManager shieldManager;
     [SerializeField] Slider ShieldSlider;
     [SerializeField] TextMeshProUGUI ShieldText;
 
     private void Awake()
     {
-        player = GameObject.FindObjectOfType<Player>();
-        if (player != null)
+        shieldManager = GameObject.FindObjectOfType<ShieldManager>();
+        if (shieldManager != null)
         {
             // this will subscribe the observer to the player
-            player.AddObserver(this);
+            shieldManager.AddObserver(this);
+            shieldManager.NotifyObservers(UIState.ShieldChanged);
         }
         else
         {
@@ -26,22 +27,49 @@ public class ShieldUIObserver : MonoBehaviour, IPlayerObserver
         }
     }
 
+    public void OnStateChange(ShieldManager shieldManager, UIState state)
+    {
+        if (state == UIState.ShieldChanged)
+        {
+            // Debug.Log($"I am notified of {this} and I am Shield UI Observer.");
+            UpdateShieldUi(shieldManager);
+        }
+    }
+
+    private void UpdateShieldUi(ShieldManager shieldManager)
+    {
+        ShieldSlider.maxValue = shieldManager.ShieldMaxTime;
+        ShieldSlider.value = shieldManager.CurrentShieldTime;
+        ShieldText.text = (Mathf.Round(shieldManager.CurrentShieldTime * 100.00f) * 0.01f).ToString() + "/" + shieldManager.ShieldMaxTime.ToString();
+    }
+
+
+    // public void OnPlayerStateChange(Player player, UIState state)
+    // {
+    //     if (state == UIState.ShieldChanged)
+    //     {
+    //         Debug.Log($"I am notified of {this} and I am Shield UI Observer.");
+    //         // UpdateShieldUi(player);
+    //     }
+    // }
 
     // the observer will be notified when the player state changes
     // the player state is not independent class so i must use Player.PlayerState
-    public void OnPlayerStateChange(Player player, Player.PlayerState state)
-    {
-        if (state == Player.PlayerState.ShieldChanged)
-        {
-            Debug.Log($"I am notified of {this} and I am Shield UI Observer.");
+    // public void OnPlayerStateChange(Player player, Player.PlayerState state)
+    // {
+    //     if (state == Player.PlayerState.ShieldChanged)
+    //     {
+    //         // Debug.Log($"I am notified of {this} and I am Shield UI Observer.");
 
-            UpdateShieldUi(player);
-        }
-    }
-    private void UpdateShieldUi(Player player)
-    {
-        ShieldSlider.maxValue = player.GetShieldMaxTime();
-        ShieldSlider.value = player.GetCurrentShieldTime();
-        ShieldText.text = (Mathf.Round(player.GetCurrentShieldTime() * 100.00f) * 0.01f).ToString() + "/" + player.GetShieldMaxTime().ToString();
-    }
+    //         UpdateShieldUi(player);
+    //     }
+    // }
+    // private void UpdateShieldUi(Player player)
+    // {
+    //     ShieldSlider.maxValue = player.GetShieldMaxTime();
+    //     ShieldSlider.value = player.GetCurrentShieldTime();
+    //     ShieldText.text = (Mathf.Round(player.GetCurrentShieldTime() * 100.00f) * 0.01f).ToString() + "/" + player.GetShieldMaxTime().ToString();
+    // }
+
+
 }

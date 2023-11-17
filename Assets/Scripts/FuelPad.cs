@@ -4,60 +4,32 @@ using UnityEngine;
 
 public class FuelPad : MonoBehaviour
 {
-    [SerializeField] float refillCooldown;
-    [SerializeField] float RefillSpeed = 1;
-    [SerializeField] bool isPlayerInside = false;
+    public bool isPlayerInside = false;
 
 
-    GameObject PlayerScript;
-    Player player;
-    AudioSource AS;
+    public Player player;
+    public AudioSource AS;
 
     [SerializeField] AudioClip FuelStationSound;
 
+
+    public FuelPadState currentState;
+
     private void Start()
     {
-        PlayerScript = GameObject.FindGameObjectWithTag("Player");
-        player = PlayerScript.GetComponent<Player>();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         AS = gameObject.GetComponent<AudioSource>();
+
+        currentState = new IdleState();
     }
 
     private void Update()
     {
-        if (isPlayerInside)
+        if (currentState != null)
         {
-            if (player.enabled)
-            {
-                if (refillCooldown > 0f)
-                {
-                    if (player.GetFuelCounter() < 60)
-                    {
-                        player.FuelUsage(RefillSpeed);
-                        refillCooldown -= RefillSpeed * Time.deltaTime;
-                    }
-                    else if (player.GetFuelCounter() > 60)
-                    {
-                        AS.Stop();
-                        // player.SetFuelCounter(60);
-                    }
-                }
-                else
-                {
-                    AS.Stop();
-                    refillCooldown = 0;
-                    this.enabled = false;
-                }
-                if ((!player.enabled) && (player.GetFuelCounter() > 0))
-                {
-                    player.enabled = true;
-                }
-
-            }
-            else
-            {
-                return;
-            }
+            currentState.UpdateStats(this);
         }
+
     }
 
     private void OnTriggerEnter(Collider other)

@@ -16,10 +16,6 @@ public class RotateRight : Command
     public override void Execute(Rigidbody rigidbody, AudioSource audioSource)
     {
         ApplyRotation(rigidbody, -1);
-        if (!rightThrustParticles.isPlaying)
-        {
-            rightThrustParticles.Play();
-        }
     }
 
     private void ApplyRotation(Rigidbody rigidbody, float rotation)
@@ -29,5 +25,10 @@ public class RotateRight : Command
         rigidbody.freezeRotation = true;
         transform.Rotate(Vector3.forward * Time.deltaTime * rotationSpeed * rotation);
         rigidbody.freezeRotation = false;
+        
+        if (!rightThrustParticles.isPlaying)
+        {
+            rightThrustParticles.Play();
+        }
     }
 }

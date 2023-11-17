@@ -1,0 +1,26 @@
+{
+    "level01": {
+        "numberOfDeaths": 0,
+        "collectedStars": 3,
+        "lastCheckpoint": {
+            "data here": "data here"
+        }
+    },
+    "level02": {
+        "numberOfDeaths": 0,
+        "collectedStars": 0,
+        "lastCheckpoint": {
+            "data here": "data here"
+        }
+    },
+    "level03": {
+        "numberOfDeaths": 0,
+        "collectedStars": 0,
+        "lastCheckpoint": {
+            "data here": "data here"
+        }
+    },
+
+    "totalNumberOfDeaths": 0,
+    "lastLevelReached": "Level03"
+}

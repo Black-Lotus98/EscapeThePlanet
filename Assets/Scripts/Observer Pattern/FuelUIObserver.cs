@@ -5,18 +5,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FuelUIObserver : MonoBehaviour, IPlayerObserver
+public class FuelUIObserver : MonoBehaviour, IUIObserver<FuelManager>
 {
-    private Player player;
+    private FuelManager fuelManager;
     [SerializeField] Slider FuelSlider;
 
     private void Awake()
     {
-        player = GameObject.FindObjectOfType<Player>();
-        if (player != null)
+        fuelManager = GameObject.FindObjectOfType<FuelManager>();
+        if (fuelManager != null)
         {
             // this will subscribe the observer to the player
-            player.AddObserver(this);
+            fuelManager.AddObserver(this);
+            fuelManager.NotifyObservers(UIState.FuelChanged);
         }
         else
         {
@@ -26,18 +27,27 @@ public class FuelUIObserver : MonoBehaviour, IPlayerObserver
 
     // the observer will be notified when the player state changes
     // the player state is not independent class so i must use Player.PlayerState
-    public void OnPlayerStateChange(Player player, Player.PlayerState state)
+    // public void OnPlayerStateChange(Player player, Player.PlayerState state)
+    // {
+    //     if (state == Player.PlayerState.FuelChanged)
+    //     {
+    //         // Debug.Log($"I am notified of {this} and I am Fuel UI Observer.");
+    //         UpdateFuelUi(player);
+    //     }
+    // }
+
+    public void OnStateChange(FuelManager fuelManager, UIState state)
     {
-        if (state == Player.PlayerState.FuelChanged)
+        if (state == UIState.FuelChanged)
         {
-            Debug.Log($"I am notified of {this} and I am Fuel UI Observer.");
-            UpdateFuelUi(player);
+            // Debug.Log($"I am notified of {this} and I am Fuel UI Observer.");
+            UpdateFuelUi(fuelManager);
         }
     }
-    private void UpdateFuelUi(Player player)
+    private void UpdateFuelUi(FuelManager fuelManager)
     {
         // Debug.Log($"I am notified of {this} and I am Update Fuel UI Observer.");
-        FuelSlider.maxValue = player.GetMaxFlightTime();
-        FuelSlider.value = player.GetFuelCounter();
+        FuelSlider.maxValue = fuelManager.MaxFlightTime;
+        FuelSlider.value = fuelManager.FuelAmount;
     }
 }

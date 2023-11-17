@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System.Linq;
 
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IObservable
 {
     [SerializeField] AudioSource AS;
     [SerializeField] AudioSource CollectableAS;
@@ -35,8 +37,9 @@ public class Player : MonoBehaviour
             if (shieldCanBeUsed != value)
             {
                 shieldCanBeUsed = value;
-                NotifyObservers(PlayerState.ShieldChanged);
-                NotifyObservers(PlayerState.FuelChanged);
+                NotifyObservers(UIState.ShieldChanged);
+                // NotifyObservers(PlayerState.ShieldChanged);
+                // NotifyObservers(PlayerState.FuelChanged);
             }
         }
     }
@@ -49,28 +52,33 @@ public class Player : MonoBehaviour
     // [SerializeField] TextMeshProUGUI ShieldText;
     bool shieldIsActive = false;
 
-
     [Header("Other Settings")]
-    [SerializeField] Image[] Stars;
-    [SerializeField] Sprite CollectedStar;
-    [SerializeField] Sprite UncollectedStar;
-    int collectedStarsCounter = 0;
-    bool starStatus = true;
-    [SerializeField] Image Key;
-    [SerializeField] Sprite CollectedKey;
     [SerializeField] bool playerHasKey = false;
 
+    public int StarsCollected = 0;
+
+
+    [Header("Game Managers")]
+    [SerializeField] ShieldManager shieldManager;
+    SaveDataManager saveDataManager;
+
+    public ShieldManager GetShieldManager()
+    {
+        return shieldManager;
+    }
 
     // The enums are used to prevent the observer from 
     // being notified whenever the state of the shield or fuel changes
     // so the enum will be used to check the state of the shield and fuel independently
     // To access the state of the shield and fuel use in the observers I must use Player.PlayerState.ENUMVALUE
     // For example: Player.PlayerState.ShieldChanged or Player.PlayerState.FuelChanged
-    public enum PlayerState
-    {
-        FuelChanged,
-        ShieldChanged,
-    }
+    // public enum PlayerState
+    // {
+    //     FuelChanged,
+    //     ShieldChanged,
+    //     KeyState,
+    //     StarsState,
+    // }
 
     private List<IPlayerObserver> observers = new List<IPlayerObserver>();
 
@@ -84,19 +92,28 @@ public class Player : MonoBehaviour
         observers.Remove(observer);
     }
 
-    public void NotifyObservers(PlayerState state)
+    public void NotifyObservers(UIState state)
     {
         foreach (IPlayerObserver observer in observers)
         {
             observer.OnPlayerStateChange(this, state);
         }
     }
+    // public void NotifyObservers(PlayerState state)
+    // {
+    //     foreach (IPlayerObserver observer in observers)
+    //     {
+    //         observer.OnPlayerStateChange(this, state);
+    //     }
+    // }
 
-    public void ExecutePowerUp(ICollectibleBehavior collectableBehaviour)
+    public void ExecutePowerUp(ICollectibleBehavior<UIManager> collectableBehaviour)
     {
-        collectableBehaviour.ExecutePowerUp(this);
-        NotifyObservers(PlayerState.ShieldChanged);
-        NotifyObservers(PlayerState.FuelChanged);
+        // collectableBehaviour.ExecutePowerUp(this);
+        NotifyObservers(UIState.ShieldChanged);
+        NotifyObservers(UIState.FuelChanged);
+        // NotifyObservers(PlayerState.ShieldChanged);
+        // NotifyObservers(PlayerState.FuelChanged);
     }
 
 
@@ -104,15 +121,22 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        NotifyObservers(PlayerState.ShieldChanged);
-        NotifyObservers(PlayerState.FuelChanged);
+        saveDataManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+        NotifyObservers(UIState.ShieldChanged);
+        NotifyObservers(UIState.FuelChanged);
+
+        // NotifyObservers(PlayerState.ShieldChanged);
+        // NotifyObservers(PlayerState.FuelChanged);
         // UpdateShieldUi();
     }
 
+    // void Awake()
+    // {
+    //     Stars = FindObjectsOfType<Star>();
+    // }
 
     void Update()
     {
-
         if (gameObject.GetComponent<InputHandler>().enabled)
         {
             ActivateShield();
@@ -160,14 +184,16 @@ public class Player : MonoBehaviour
             if (CurrentShieldTime > 0.0f)
             {
                 CurrentShieldTime -= Time.deltaTime;
-                NotifyObservers(PlayerState.ShieldChanged);
+                NotifyObservers(UIState.ShieldChanged);
+                // NotifyObservers(PlayerState.ShieldChanged);
             }
             else
             {
                 AS.Stop();
                 CurrentShieldTime = 0.0f;
                 ShieldCanBeUsed = false;
-                NotifyObservers(PlayerState.ShieldChanged);
+                NotifyObservers(UIState.ShieldChanged);
+                // NotifyObservers(PlayerState.ShieldChanged);
             }
 
         }
@@ -177,7 +203,8 @@ public class Player : MonoBehaviour
     {
         CollectableAS.PlayOneShot(FuelBarrelCollectableSound);
         CurrentShieldTime += amount;
-        NotifyObservers(PlayerState.ShieldChanged);
+        NotifyObservers(UIState.ShieldChanged);
+        // NotifyObservers(PlayerState.ShieldChanged);
         ShieldCanBeUsed = true;
     }
 
@@ -205,7 +232,8 @@ public class Player : MonoBehaviour
             {
                 FuelCounter += amount * Time.deltaTime;
             }
-            NotifyObservers(PlayerState.FuelChanged);
+            NotifyObservers(UIState.FuelChanged);
+            // NotifyObservers(PlayerState.FuelChanged);
         }
     }
 
@@ -222,7 +250,8 @@ public class Player : MonoBehaviour
             FuelCounter += amount;
 
         }
-        NotifyObservers(PlayerState.FuelChanged);
+        NotifyObservers(UIState.FuelChanged);
+        // NotifyObservers(PlayerState.FuelChanged);
     }
 
     public bool GetIsUsingFuel()
@@ -248,38 +277,41 @@ public class Player : MonoBehaviour
     }
 
 
-    public int GetNumberOfStars()
-    {
-        return Stars.Length;
-    }
+    // public int GetNumberOfStars()
+    // {
+    //     return Stars.Length;
+    // }
 
-    public void UpdateStarsGUI()
-    {
-        Stars[collectedStarsCounter].GetComponent<Image>().sprite = CollectedStar;
-    }
+    // public void UpdateStarsGUI()
+    // {
+    //     Stars[collectedStarsCounter].GetComponent<Image>().sprite = CollectedStar;
+    // }
 
-    public bool GetStarStatus(int index)
-    {
-        if (Stars[index].gameObject.GetComponent<Image>().sprite != UncollectedStar)
-        {
-            starStatus = false;
-        }
-        return starStatus;
-    }
+    // public bool GetStarStatus(int index)
+    // {
+    //     if (Stars[index].gameObject.GetComponent<Image>().sprite != UncollectedStar)
+    //     {
+    //         starStatus = false;
+    //     }
+    //     return starStatus;
+    // }
 
-    public int GetCollectedStarsCounter()
+    public int GetStarCount()
     {
-        return collectedStarsCounter;
+        GameData gameData = SaveManager.Load();
+        var currentLevelData = GetLevelData(gameData);
+
+        return currentLevelData.collectedStars;
     }
 
     public void SetCollectedStarsCounter(int amount)
     {
-        this.collectedStarsCounter += amount;
-    }
+        saveDataManager.SaveCollectedStar();
 
-    public void UpdateKeyGUI()
-    {
-        Key.GetComponent<Image>().sprite = CollectedKey;
+        CollectableAS.PlayOneShot(FuelBarrelCollectableSound);
+        // NotifyObservers(PlayerState.StarsState);
+        NotifyObservers(UIState.StarsState);
+
     }
 
     public bool GetKeyStatus()
@@ -289,10 +321,25 @@ public class Player : MonoBehaviour
 
     public void SetKeyStatus(bool status)
     {
-        UpdateKeyGUI();
+        // UpdateKeyGUI();
+        CollectableAS.PlayOneShot(FuelBarrelCollectableSound);
+        NotifyObservers(UIState.KeyState);
+        // NotifyObservers(PlayerState.KeyState);
         playerHasKey = status;
     }
 
+    LevelData GetLevelData(GameData gameData)
+    {
+        var sceneData = SceneManager.GetActiveScene();
+
+        // using .buildIndex to get the scene index and .name to get the scene name
+        var currentLevelData = gameData.levelData.Where(x => x.currentLevelIndex == sceneData.buildIndex).FirstOrDefault();
+        if (currentLevelData == null)
+        {
+            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex, 1, 0);
+        }
+        return currentLevelData;
+    }
 
     // Unused methods
     // this method is no longer needed because of the observer pattern
