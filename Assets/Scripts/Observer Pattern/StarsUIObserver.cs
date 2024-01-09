@@ -36,6 +36,7 @@ public class StarsUIObserver : MonoBehaviour, IUIObserver<StarsManager>
     {
         //The -1 here because the array index start from 0 while the start Id start from 1
         int starId = aStarsManager.CollectedStarsCounter-1;
+        Debug.Log($"starId: {starId}");
         StarImages[starId].GetComponent<Image>().sprite = CollectedStar;
     }
 }

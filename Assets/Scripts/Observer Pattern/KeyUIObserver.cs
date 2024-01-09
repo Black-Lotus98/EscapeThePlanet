@@ -30,12 +30,15 @@ public class KeyUIObserver : MonoBehaviour, IUIObserver<KeyManager>
         if (state == UIState.KeyState)
         {
             // Debug.Log($"I am notified of {this} and I am Fuel UI Observer.");
-            UpdateKeyUI();
+            UpdateKeyUI(KeyManager);
         }
     }
 
-    private void UpdateKeyUI()
+    private void UpdateKeyUI(KeyManager aKeyManager)
     {
-        KeyImage.GetComponent<Image>().sprite = CollectedKey;
+        if (aKeyManager.PlayerHasKey)
+        {
+            KeyImage.GetComponent<Image>().sprite = CollectedKey;
+        }
     }
 }

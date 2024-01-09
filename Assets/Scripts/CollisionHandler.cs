@@ -32,6 +32,7 @@ public class CollisionHandler : MonoBehaviour
     void Start()
     {
         // Finding the SaveDataManager
+
         SaveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
 
         // Loading the data from the SaveDataManager
@@ -49,16 +50,18 @@ public class CollisionHandler : MonoBehaviour
         {
             gameData.lastLevelReached = SceneManager.GetActiveScene().buildIndex;
         }
-
-
-        SaveManager.Save(gameData);
-
         AS = GetComponent<AudioSource>();
 
-        //Load the data to check if the game is restarted or not
-        LoadData();
-        //Then the data is saved again to keep it on track
-        SaveProgress();
+        if (!isTutorial)
+        {
+            SaveManager.Save(gameData);
+
+            //Load the data to check if the game is restarted or not
+            LoadData();
+            //Then the data is saved again to keep it on track
+            SaveProgress();
+        }
+
     }
 
     // void Update()
@@ -116,8 +119,11 @@ public class CollisionHandler : MonoBehaviour
         ExplosionParticles.Play();
         GetComponent<InputHandler>().enabled = false;
         numberOfDeaths++;
-        UpdateDataOnLosing();
-        SaveProgress();
+        if (!isTutorial)
+        {
+            UpdateDataOnLosing();
+            SaveProgress();
+        }
         Invoke("ReloadLevel", delayTime);
     }
 
@@ -134,7 +140,7 @@ public class CollisionHandler : MonoBehaviour
         {
             currentLevelData.collectedStars = currentCollectedStars;
         }
-        
+
         SaveManager.ResetCollectedStars();
         SaveManager.ResetTempCollectedStars();
         isTransitioning = true;
@@ -142,18 +148,19 @@ public class CollisionHandler : MonoBehaviour
         AS.PlayOneShot(Finish);
         FinishParticles.Play();
         GetComponent<InputHandler>().enabled = false;
-        if (!isTutorial)
-        {
-            gameManager.WinLevel();
-            Invoke("LoadNextLevel", delayTime);
-        }
-        else
-        {
-            FinishTutorialPlane.SetActive(true);
-            Invoke("loadTutorial", delayTime);
-        }
-
+        gameManager.WinLevel();
+        Invoke("LoadNextLevel", delayTime);
         SaveManager.Save(gameData);
+    }
+    public void FinishTutorial()
+    {
+        isTransitioning = true;
+        AS.Stop();
+        AS.PlayOneShot(Finish);
+        FinishParticles.Play();
+        GetComponent<InputHandler>().enabled = false;
+        FinishTutorialPlane.SetActive(true);
+        Invoke("loadTutorial", delayTime);
 
     }
 
@@ -229,6 +236,19 @@ public class CollisionHandler : MonoBehaviour
         return currentLevelData;
     }
 
+    void loadTutorial()
+    {
+        int CurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        if (CurrentSceneIndex + 1 < SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(CurrentSceneIndex + 1);
+        }
+        else
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
+    }
+
     // This method is used only on the PC platform
     // void CheatKeys()
     // {
@@ -248,19 +268,6 @@ public class CollisionHandler : MonoBehaviour
 
     // }
 
-    // the LoadTutorial method was used to load the tutorial scene but the functionality was moved to the LevelSelector script
-    // void loadTutorial()
-    // {
-    //     int CurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-    //     if (CurrentSceneIndex + 1 < SceneManager.sceneCountInBuildSettings)
-    //     {
-    //         SceneManager.LoadScene(CurrentSceneIndex + 1);
-    //     }
-    //     else
-    //     {
-    //         SceneManager.LoadScene("MainMenu");
-    //     }
-    // }
 
     // void ActivateController()
     // {

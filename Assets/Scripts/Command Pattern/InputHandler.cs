@@ -72,7 +72,7 @@ public class InputHandler : MonoBehaviour
         {
             invoker.ExecuteCommand(rotateRightCommand, movementController.Rigidbdy, movementController.AS);
         }
-        if (Input.GetKeyUp(KeyCode.D) || CrossPlatformInputManager.GetButtonUp("Right") || Input.GetKeyUp(KeyCode.A) || CrossPlatformInputManager.GetButtonUp("Left"))
+        if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow) || CrossPlatformInputManager.GetButtonUp("Right") || Input.GetKeyUp(KeyCode.A) || CrossPlatformInputManager.GetButtonUp("Left"))
         {
             invoker.ExecuteCommand(stopRotationCommand, movementController.Rigidbdy, movementController.AS);
         }
