@@ -76,7 +76,7 @@ public class UIManager : MonoBehaviour, IUIObservable<UIManager>
         var currentLevelData = gameData.levelData.Where(x => x.currentLevelIndex == sceneData.buildIndex).FirstOrDefault();
         if (currentLevelData == null)
         {
-            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex, 1, 0);
+            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex);
         }
         return currentLevelData;
     }
@@ -104,7 +104,9 @@ public class UIManager : MonoBehaviour, IUIObservable<UIManager>
         }
         if (GameObject.Find("SaveDataManager") != null)
         {
-            saveDataManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+            // saveDataManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+
+            saveDataManager = SaveDataManager.Instance;
         }
     }
 

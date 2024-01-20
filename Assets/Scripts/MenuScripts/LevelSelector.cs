@@ -58,7 +58,7 @@ public class LevelSelector : MonoBehaviour
             var currentLevelData = gameData.levelData.Where(x => x.currentLevelIndex == i + 1).FirstOrDefault();
             if (currentLevelData == null)
             {
-                currentLevelData = new LevelData("Level" + (i + 1), i + 1, 0, 0);
+                currentLevelData = new LevelData("Level" + (i + 1), i + 1);
             }
             if (starPanel != null)
             {

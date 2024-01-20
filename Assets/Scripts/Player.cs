@@ -121,10 +121,15 @@ public class Player : MonoBehaviour, IObservable
 
     void Start()
     {
-        saveDataManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+        // This will look for the save data manager in the scene, but since we are using the singleton pattern,
+        // we don't need it because we can access it globally
+        // saveDataManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+
+        saveDataManager = SaveDataManager.Instance;
         NotifyObservers(UIState.ShieldChanged);
         NotifyObservers(UIState.FuelChanged);
 
+        // Part of old way to update shield and fuel ui
         // NotifyObservers(PlayerState.ShieldChanged);
         // NotifyObservers(PlayerState.FuelChanged);
         // UpdateShieldUi();
@@ -336,7 +341,7 @@ public class Player : MonoBehaviour, IObservable
         var currentLevelData = gameData.levelData.Where(x => x.currentLevelIndex == sceneData.buildIndex).FirstOrDefault();
         if (currentLevelData == null)
         {
-            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex, 1, 0);
+            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex);
         }
         return currentLevelData;
     }

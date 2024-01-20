@@ -19,11 +19,14 @@ public class PerformanceManager : MonoBehaviour
 
     void Start()
     {
-        saveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+        // saveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+
+        saveManager = SaveDataManager.Instance;
         GenerateStatsUI();
     }
     private void GenerateStatsUI()
     {
+
         // Load the saved game data
         GameData gameData = saveManager.Load();
 

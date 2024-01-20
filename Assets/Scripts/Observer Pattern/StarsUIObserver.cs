@@ -16,7 +16,6 @@ public class StarsUIObserver : MonoBehaviour, IUIObserver<StarsManager>
         {
             // this will subscribe the observer to the player
             starsManager.AddObserver(this);
-            starsManager.NotifyObservers(UIState.StarsState);
         }
         else
         {

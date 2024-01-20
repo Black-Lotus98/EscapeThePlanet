@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System;
 
-// the class is static as 
+// The class is static because there should not be an instance of this class
 public static class SaveData
 {
     public static void SavePlayerData(CollisionHandler collisionHandler)

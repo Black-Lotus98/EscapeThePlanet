@@ -12,6 +12,7 @@ public class StarsManager : UIManager, IUIObservable<StarsManager>
     void Start()
     {
         LevelData currentLevelData = GetLevelData(saveDataManager.Load());
+        Debug.Log($"Collected Stars from stars manager: {currentLevelData.collectedStars}");
         saveDataManager.TempCollectedStars = currentLevelData.collectedStars;
         currentLevelData.collectedStars = 0;
 
@@ -26,6 +27,8 @@ public class StarsManager : UIManager, IUIObservable<StarsManager>
             {
                 LevelData currentLevelData = GetLevelData(saveDataManager.Load());
                 collectedStarsCounter += value;
+                Debug.Log($"Collected Stars: {currentLevelData.collectedStars}");
+                Debug.Log($"collectedStarsCounter: {collectedStarsCounter}");
                 saveDataManager.SaveCollectedStar();
                 AS.PlayOneShot(starCollectableSound);
                 NotifyObservers(UIState.StarsState);

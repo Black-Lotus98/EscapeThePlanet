@@ -16,7 +16,7 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] bool isTutorial = false;
     [SerializeField] GameObject FinishTutorialPlane;
 
-    SaveDataManager SaveManager;
+    SaveDataManager saveDataManager;
 
 
     AudioSource AS;
@@ -33,10 +33,18 @@ public class CollisionHandler : MonoBehaviour
     {
         // Finding the SaveDataManager
 
-        SaveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+        // This will look for the save data manager in the scene, but since we are using the singleton pattern,
+        // we don't need it because we can access it globally
+        // SaveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+
+        // However, this way we dont need to used SaveDataManager.Instance every time we need it,
+        // we just use the word saveDataManager
+        saveDataManager = SaveDataManager.Instance;
 
         // Loading the data from the SaveDataManager
-        GameData gameData = SaveManager.Load();
+        GameData gameData = saveDataManager.Load();
+
+        // GameData gameData = SaveManager.Load();
         // Getting the current level data from the game data
         // LevelData currentLevelData = GetLevelData(gameData);
 
@@ -54,7 +62,7 @@ public class CollisionHandler : MonoBehaviour
 
         if (!isTutorial)
         {
-            SaveManager.Save(gameData);
+            saveDataManager.Save(gameData);
 
             //Load the data to check if the game is restarted or not
             LoadData();
@@ -129,20 +137,24 @@ public class CollisionHandler : MonoBehaviour
 
     public void StartSuccessSequence()
     {
-        GameData gameData = SaveManager.Load();
+        GameData gameData = saveDataManager.Load();
         LevelData currentLevelData = GetLevelData(gameData);
-        int currentCollectedStars = SaveManager.GetCollectedStars();
-        if (SaveManager.TempCollectedStars >= currentCollectedStars)
+        int currentCollectedStars = saveDataManager.GetCollectedStars();
+        Debug.Log($"Current Collected Stars inside StartSuccessSequence: {currentCollectedStars}");
+        if (saveDataManager.TempCollectedStars >= currentCollectedStars)
         {
-            currentLevelData.collectedStars = SaveManager.TempCollectedStars;
+            currentLevelData.collectedStars = saveDataManager.TempCollectedStars;
+            Debug.Log($"Current Collected Stars inside if statement condition 1: {currentCollectedStars}");
         }
         else
         {
             currentLevelData.collectedStars = currentCollectedStars;
+            Debug.Log($"Current Collected Stars inside if statement condition 2: {currentCollectedStars}");
+
         }
 
-        SaveManager.ResetCollectedStars();
-        SaveManager.ResetTempCollectedStars();
+        saveDataManager.ResetCollectedStars();
+        saveDataManager.ResetTempCollectedStars();
         isTransitioning = true;
         AS.Stop();
         AS.PlayOneShot(Finish);
@@ -150,7 +162,7 @@ public class CollisionHandler : MonoBehaviour
         GetComponent<InputHandler>().enabled = false;
         gameManager.WinLevel();
         Invoke("LoadNextLevel", delayTime);
-        SaveManager.Save(gameData);
+        saveDataManager.Save(gameData);
     }
     public void FinishTutorial()
     {
@@ -198,12 +210,12 @@ public class CollisionHandler : MonoBehaviour
 
     void UpdateDataOnLosing()
     {
-        GameData gameData = SaveManager.Load();
+        GameData gameData = saveDataManager.Load();
         var currentLevelData = GetLevelData(gameData);
         currentLevelData.numberOfDeaths++;
-        SaveManager.ResetTempCollectedStars();
+        saveDataManager.ResetTempCollectedStars();
         gameData.totalNumberOfDeaths++;
-        SaveManager.Save(gameData);
+        saveDataManager.Save(gameData);
     }
 
     // The method is used in the StartSuccessSequence method
@@ -231,7 +243,7 @@ public class CollisionHandler : MonoBehaviour
         var currentLevelData = gameData.levelData.Where(x => x.currentLevelIndex == sceneData.buildIndex).FirstOrDefault();
         if (currentLevelData == null)
         {
-            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex, 1, 0);
+            currentLevelData = new LevelData(sceneData.name, sceneData.buildIndex);
         }
         return currentLevelData;
     }

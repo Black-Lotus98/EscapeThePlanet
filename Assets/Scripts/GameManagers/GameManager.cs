@@ -19,7 +19,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        saveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+        // This will look for the save data manager in the scene, but since we are using the singleton pattern,
+        // we don't need it because we can access it globally
+        // saveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
+
+        saveManager = SaveDataManager.Instance;
 
         var starts = GameObject.FindGameObjectsWithTag("StarCollectable");
         foreach (var star in starts)
@@ -47,7 +51,6 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         saveManager.ResetCollectedStars();
-
         PlayerPrefs.SetInt("levelReached", 1);
         LevelIsOver = false;
     }

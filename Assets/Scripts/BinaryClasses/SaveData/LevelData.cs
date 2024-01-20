@@ -21,8 +21,13 @@ public class LevelData
         this.numberOfDeaths = aNumberOfDeaths;
     }
 
-
-
+    public LevelData(string aLevelName, int aLevelIndex)
+    {
+        this.currentLevelName = aLevelName;
+        this.currentLevelIndex = aLevelIndex;
+        this.collectedStars = 0;
+        this.numberOfDeaths = 0;
+    }
 }
 
 

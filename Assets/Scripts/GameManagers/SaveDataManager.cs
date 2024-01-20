@@ -15,12 +15,17 @@ public class SaveDataManager : Singleton<SaveDataManager>
     public int TempCollectedStars
     {
         get { return tempOldCollectedStars; }
-        set { tempOldCollectedStars = value; }
+        set
+        {
+            tempOldCollectedStars = value;
+            Debug.Log($"TempCollectedStars: {tempOldCollectedStars}");
+        }
     }
+  
 
     public void ResetTempCollectedStars()
     {
-        tempOldCollectedStars = 0;
+        TempCollectedStars = 0;
     }
 
 
