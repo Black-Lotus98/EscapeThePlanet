@@ -12,6 +12,7 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>
     [SerializeField] AudioClip fuelCollectableSound;
 
 
+
     // Getters and Setters
     public bool IsUsingFuel
     {
@@ -50,11 +51,17 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>
     }
     public void FuelConsumption(float amount)
     {
-        if (isUsingFuel)
+        if (IsUsingFuel)
         {
-            fuelAmount += amount * Time.deltaTime;
+            if (FuelAmount <= 0)
+            {
+                FuelAmount = 0;
+            }
+            else
+            {
+                FuelAmount -= amount * Time.deltaTime;
+            }
             NotifyObservers(UIState.FuelChanged);
-            // NotifyObservers(PlayerState.FuelChanged);
         }
     }
 
@@ -65,14 +72,14 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>
 
     public void FuelBarrel(int amount)
     {
-        if (fuelAmount > maxFlightTime)
+        if (FuelAmount > maxFlightTime)
         {
-            fuelAmount = maxFlightTime;
+            FuelAmount = maxFlightTime;
         }
         else
         {
             CollectableAS.PlayOneShot(fuelCollectableSound);
-            fuelAmount += amount;
+            FuelAmount += amount;
 
         }
         NotifyObservers(UIState.FuelChanged);
@@ -81,6 +88,14 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>
     public void ExecutePowerUp(ICollectibleBehavior<FuelManager> collectableBehaviour)
     {
         collectableBehaviour.ExecutePowerUp(this);
+        NotifyObservers(UIState.FuelChanged);
+    }
+
+    public void RefillFuel(float refillSpeed)
+    {
+        // Using the * refillSpeed to make the refill depend on how fast the player is refilling
+        FuelAmount += Time.deltaTime * refillSpeed;
+        isUsingFuel = true;
         NotifyObservers(UIState.FuelChanged);
     }
 

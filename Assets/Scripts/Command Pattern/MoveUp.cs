@@ -24,14 +24,12 @@ public class MoveUp : Command
         {
             if (fuelManager.FuelAmount <= 0)
             {
-                fuelManager.FuelAmount = 0;
                 audioSource.Stop();
+                rocketBoostParticles.Stop();
                 return;
             }
-            fuelManager.FuelConsumption(-1);
-            fuelManager.NotifyObservers(UIState.FuelChanged);
+            fuelManager.FuelConsumption(1);
         }
-        rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed);
 
         if (!audioSource.isPlaying)
         {
@@ -41,5 +39,8 @@ public class MoveUp : Command
         {
             rocketBoostParticles.Play();
         }
+
+        rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed);
     }
+
 }

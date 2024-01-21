@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 3683148457593480977}
   - component: {fileID: 3683148457593480976}
   - component: {fileID: 1386743663}
-  - component: {fileID: 1386743662}
   - component: {fileID: 1287087380}
+  - component: {fileID: 1386743662}
   - component: {fileID: 1443245757}
   m_Layer: 0
   m_Name: FuelPad
@@ -115,23 +115,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 5.34259, z: 1}
   m_Center: {x: 0, y: 2.171295, z: 0}
---- !u!114 &1386743662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3683148457593480979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0a9526f65d6c1343b3a57578d1a49c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isPlayerInside: 0
-  player: {fileID: 0}
-  AS: {fileID: 0}
-  FuelStationSound: {fileID: 8300000, guid: 1a7aa77e3c4b7df4686ce55fd3be714c, type: 3}
-  currentState: {fileID: 11400000, guid: b9a6b5dbf4210c8448cf228e3f05e2d1, type: 2}
 --- !u!82 &1287087380
 AudioSource:
   m_ObjectHideFlags: 0
@@ -228,6 +211,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1386743662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3683148457593480979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0a9526f65d6c1343b3a57578d1a49c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fuelPadData: {fileID: 11400000, guid: e91c4c878b5f91e47ae1fc7dd0e9f99f, type: 2}
+  fuelManager: {fileID: 0}
+  FuelStationSound: {fileID: 8300000, guid: 1a7aa77e3c4b7df4686ce55fd3be714c, type: 3}
 --- !u!114 &1443245757
 MonoBehaviour:
   m_ObjectHideFlags: 0

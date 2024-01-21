@@ -18,7 +18,6 @@ public class SaveDataManager : Singleton<SaveDataManager>
         set
         {
             tempOldCollectedStars = value;
-            Debug.Log($"TempCollectedStars: {tempOldCollectedStars}");
         }
     }
   
