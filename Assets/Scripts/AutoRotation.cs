@@ -5,9 +5,9 @@ using UnityEngine;
 public class AutoRotation : MonoBehaviour
 {
     [SerializeField] Vector3 Rotaion;
-    [SerializeField] float RotationSpeed =150f;
+    [SerializeField] float RotationSpeed = 150f;
     void Update()
     {
-        transform.Rotate(Rotaion*Time.deltaTime * RotationSpeed ,Space.World);
+        transform.Rotate(Rotaion * Time.deltaTime * RotationSpeed, Space.World);
     }
 }

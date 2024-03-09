@@ -11,14 +11,7 @@ public class FuelBarrelCollectible : ICollectibleBehavior<FuelManager>
     {
         this.amount = amount;
     }
-
-    // public void ExecutePowerUp(Player player)
-    // {
-    //     if (player.GetFuelCounter() < player.GetMaxFlightTime())
-    //     {
-    //         player.FuelBarrel(amount);
-    //     }
-    // }
+    
     public void ExecutePowerUp(FuelManager fuelManager)
     {
         Debug.Log($"fuelManager.FuelCounter " + fuelManager.FuelAmount);
@@ -27,4 +20,12 @@ public class FuelBarrelCollectible : ICollectibleBehavior<FuelManager>
             fuelManager.FuelBarrel(amount);
         }
     }
+    
+    // public void ExecutePowerUp(Player player)
+    // {
+    //     if (player.GetFuelCounter() < player.GetMaxFlightTime())
+    //     {
+    //         player.FuelBarrel(amount);
+    //     }
+    // }
 }

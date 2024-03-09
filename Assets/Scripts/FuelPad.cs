@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FuelPad : MonoBehaviour
 {
-    float refillAmount;
+    public float refillAmount;
     float refillSpeed;
 
     [SerializeField] FuelPadState currentState;
@@ -57,8 +57,10 @@ public class FuelPad : MonoBehaviour
         }
     }
 
+
     public void ChangeState(FuelPadState newState)
     {
+        // The ? is used instead of using the if statement ( if (currentState != null) { currentState.DeactivateState(this); } )
         currentState?.DeactivateState(this);
         currentState = newState;
         currentState.ActivateState(this);

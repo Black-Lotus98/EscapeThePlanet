@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,13 @@ public class MoveUp : Command
 
     public override void Execute(Rigidbody rigidbody, AudioSource audioSource)
     {
+        FuelConsumption(audioSource);
+        AudioControl(audioSource);
+        rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed);
+    }
+
+    void FuelConsumption(AudioSource audioSource)
+    {
         if (fuelManager.IsUsingFuel)
         {
             if (fuelManager.FuelAmount <= 0)
@@ -30,7 +38,10 @@ public class MoveUp : Command
             }
             fuelManager.FuelConsumption(1);
         }
+    }
 
+    void AudioControl(AudioSource audioSource)
+    {
         if (!audioSource.isPlaying)
         {
             audioSource.PlayOneShot(mainEngine);
@@ -39,8 +50,6 @@ public class MoveUp : Command
         {
             rocketBoostParticles.Play();
         }
-
-        rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed);
     }
 
 }

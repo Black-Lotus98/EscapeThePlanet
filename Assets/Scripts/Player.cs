@@ -7,6 +7,9 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
+// Currently not in use
+// The script is refactored and separated into different classes as it 
+// manages different functionalities
 
 public class Player : MonoBehaviour, IObservable
 {

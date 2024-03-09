@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+// Currently not in use
+
 // The Player observer interface
 public interface IPlayerObserver
 {

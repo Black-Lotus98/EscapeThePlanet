@@ -9,7 +9,6 @@ public class KeyUIObserver : MonoBehaviour, IUIObserver<KeyManager>
     private KeyManager keyManager;
     [SerializeField] Image KeyImage;
     [SerializeField] Sprite CollectedKey;
-    [SerializeField] Sprite DamagedKey;
     private void Awake()
     {
         keyManager = GameObject.FindObjectOfType<KeyManager>();

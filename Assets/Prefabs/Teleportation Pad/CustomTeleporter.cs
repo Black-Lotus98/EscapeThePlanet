@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class CustomTeleporter : MonoBehaviour
 {
@@ -120,7 +121,7 @@ public class CustomTeleporter : MonoBehaviour
 		else if(buttonTeleport) //if you selected a teleport activated by a button
 		{
 			//checks if the button you set in the inspector is being pressed
-			if(Input.GetButtonDown(buttonName))
+			if(Input.GetButtonDown(buttonName) || CrossPlatformInputManager.GetButtonDown(buttonName))
 			{
 				if(delayedTeleport) //if you set it to button + delayed
 				{

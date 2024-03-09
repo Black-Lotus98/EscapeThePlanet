@@ -67,10 +67,10 @@ public class DoorTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        var player = other.gameObject.GetComponent<Player>();
+        var KeyManager = other.gameObject.GetComponent<KeyManager>();
         if (other.gameObject.tag == "Player")
         {
-            playerHasKey = player.GetKeyStatus();
+            playerHasKey = KeyManager.PlayerHasKey;
             textGO.SetActive(true);
             isPlayerInside = true;
         }

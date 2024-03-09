@@ -14,6 +14,8 @@ TagManager:
   - Key
   - Fire
   - AnimatedCamera
+  - TeleportBtn
+  - TPBtn
   layers:
   - Default
   - TransparentFX

@@ -11,13 +11,14 @@ public class KeyCollectible : ICollectibleBehavior<KeyManager>
         this.hasKey = hasKey;
     }
 
+    public void ExecutePowerUp(KeyManager keyManager)
+    {
+        keyManager.PlayerHasKey = hasKey;
+    }
+
     // public void ExecutePowerUp(Player player)
     // {
     //     // Debug.Log($"Execute key power up");
     //     player.SetKeyStatus(hasKey);
     // }
-    public void ExecutePowerUp(KeyManager keyManager)
-    {
-        keyManager.PlayerHasKey = hasKey;
-    }
 }
