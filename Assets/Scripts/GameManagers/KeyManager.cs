@@ -5,20 +5,32 @@ using UnityEngine.SceneManagement;
 
 public class KeyManager : UIManager, IUIObservable<KeyManager>
 {
-    [SerializeField] bool playerHasKey = false;
-    [SerializeField] AudioClip keyCollectableSound;
+    [Header("Key Settings")]
+    [SerializeField] private bool playerHasKey = false;
+    [SerializeField] private AudioClip keyCollectableSound;
 
     public bool PlayerHasKey
     {
-        get { return this.playerHasKey; }
+        get { return playerHasKey; }
         set
         {
+            if (playerHasKey == value)
+            {
+                return; // No change needed
+            }
+
             playerHasKey = value;
-            CollectableAS.PlayOneShot(keyCollectableSound);
+            
+            if (CollectableAS != null && keyCollectableSound != null)
+            {
+                CollectableAS.PlayOneShot(keyCollectableSound);
+            }
+            
             NotifyObservers(UIState.KeyState);
         }
     }
-    private List<IUIObserver<KeyManager>> observers = new List<IUIObserver<KeyManager>>();
+
+    private readonly List<IUIObserver<KeyManager>> observers = new List<IUIObserver<KeyManager>>();
 
     public void AddObserver(IUIObserver<KeyManager> observer)
     {
@@ -38,11 +50,17 @@ public class KeyManager : UIManager, IUIObservable<KeyManager>
 
     public new void NotifyObservers(UIState state)
     {
+        Debug.Log($"KeyManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
-            observer.OnStateChange(this, state);
+            if (observer != null)
+            {
+                observer.OnStateChange(this, state);
+            }
+            else
+            {
+                Debug.LogWarning("Null observer found in KeyManager observers list!");
+            }
         }
     }
-
-
 }

@@ -5,11 +5,10 @@ using UnityEngine;
 
 public class MoveUp : Command
 {
-    private float movementSpeed;
-    private AudioClip mainEngine;
-    private ParticleSystem rocketBoostParticles;
-
-    private FuelManager fuelManager;
+    private readonly float movementSpeed;
+    private readonly AudioClip mainEngine;
+    private readonly ParticleSystem rocketBoostParticles;
+    private readonly FuelManager fuelManager;
 
     public MoveUp(float movementSpeed, AudioClip mainEngine, ParticleSystem rocketBoostParticles, FuelManager fuelManager)
     {
@@ -21,35 +20,59 @@ public class MoveUp : Command
 
     public override void Execute(Rigidbody rigidbody, AudioSource audioSource)
     {
-        FuelConsumption(audioSource);
-        AudioControl(audioSource);
+        // Check fuel consumption first
+        if (!HandleFuelConsumption(audioSource))
+        {
+            return; // Exit if no fuel
+        }
+        
+        // Apply movement force
         rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed);
+        
+        // Handle audio and particles
+        HandleAudioAndParticles(audioSource);
     }
 
-    void FuelConsumption(AudioSource audioSource)
+    private bool HandleFuelConsumption(AudioSource audioSource)
     {
-        if (fuelManager.IsUsingFuel)
+        if (fuelManager == null || !fuelManager.IsUsingFuel)
         {
-            if (fuelManager.FuelAmount <= 0)
+            return true; // No fuel system or fuel not required
+        }
+        
+        if (fuelManager.FuelAmount <= 0)
+        {
+            // Stop audio and particles when out of fuel
+            if (audioSource != null && audioSource.isPlaying)
             {
                 audioSource.Stop();
-                rocketBoostParticles.Stop();
-                return;
             }
-            fuelManager.FuelConsumption(1);
+            
+            if (rocketBoostParticles != null && rocketBoostParticles.isPlaying)
+            {
+                rocketBoostParticles.Stop();
+            }
+            
+            return false; // No fuel available
         }
+        
+        // Consume fuel
+        fuelManager.FuelConsumption(1);
+        return true;
     }
 
-    void AudioControl(AudioSource audioSource)
+    private void HandleAudioAndParticles(AudioSource audioSource)
     {
-        if (!audioSource.isPlaying)
+        // Handle audio
+        if (audioSource != null && mainEngine != null && !audioSource.isPlaying)
         {
             audioSource.PlayOneShot(mainEngine);
         }
-        if (!rocketBoostParticles.isPlaying)
+        
+        // Handle particles
+        if (rocketBoostParticles != null && !rocketBoostParticles.isPlaying)
         {
             rocketBoostParticles.Play();
         }
     }
-
 }

@@ -4448,7 +4448,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 2.0192573, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -7279,7 +7279,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextLevel: Level05
   levelToReach: 5
-  starsList: []
+  saveManager: {fileID: 0}
 --- !u!1001 &3016658656955032464
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7516,9 +7516,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d4fefdce3cda848b77df4605a6e449, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPaused: 0
-  PauseMenuObj: {fileID: 1914847672}
-  HowToPlayPanel: {fileID: 1914847671}
+  isPaused: 0
+  pauseMenuObj: {fileID: 1914847672}
+  howToPlayPanel: {fileID: 1914847671}
 --- !u!82 &4821505277702256231
 AudioSource:
   m_ObjectHideFlags: 0

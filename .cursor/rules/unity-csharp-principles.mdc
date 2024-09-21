@@ -1,0 +1,57 @@
+# Unity/C# Development Principles
+
+## Core Architecture
+- Use **MonoBehaviour** for script components attached to GameObjects
+- Prefer **ScriptableObjects** for data containers and shared resources
+- Follow **Component pattern** strictly for clear separation of concerns and modularity
+- Structure project in a modular way using Unity's component-based architecture
+
+## Key Guidelines
+- Write clear, technical responses with precise C# and Unity examples
+- Use Unity's built-in features and tools wherever possible
+- Prioritize readability and maintainability
+- Follow C# coding conventions and Unity best practices
+- Use descriptive variable and function names
+
+## Naming Conventions
+- **PascalCase** for public members and methods
+- **camelCase** for private members and local variables
+- Use descriptive names that clearly indicate purpose and functionality
+
+## Unity-Specific Features
+- Leverage Unity's **physics engine** and collision detection system
+- Use Unity's **Input System** for handling player input across platforms
+- Utilize Unity's **UI system** (Canvas, UI elements) for interfaces
+- Use **Coroutines** for time-based operations and asynchronous tasks
+- Apply Unity's **tag and layer system** for object categorization
+
+## Project Structure
+- Keep game logic in scripts; use Unity Editor for scene composition
+- Use **Prefabs** for reusable game objects and UI elements
+- Utilize Unity's **animation system** (Animator, Animation Clips)
+- Apply Unity's built-in **lighting and post-processing effects**
+- Use Unity's **asset bundle system** for efficient resource management
+
+## Performance Considerations
+- Use **object pooling** for frequently instantiated/destroyed objects
+- Optimize draw calls by batching materials and using atlases
+- Implement **LOD systems** for complex 3D models
+- Use Unity's **Job System and Burst Compiler** for CPU-intensive operations
+- Optimize physics performance with simplified collision meshes
+
+## Error Handling & Debugging
+- Use Unity's **Debug class** for logging (Debug.Log, Debug.LogWarning, Debug.LogError)
+- Implement **try-catch blocks** for file I/O and network operations
+- Use Unity's **assertion system** (Debug.Assert) for logical errors
+- Utilize Unity's **profiler and frame debugger** for performance issues
+- Implement custom error messages and debug visualizations
+
+## Testing & Quality
+- Use Unity's built-in **testing framework** for unit and integration testing
+- Implement custom error messages and debug visualizations
+- Follow Unity documentation and C# programming guides for best practices
+
+description:
+globs:
+alwaysApply: true
+---

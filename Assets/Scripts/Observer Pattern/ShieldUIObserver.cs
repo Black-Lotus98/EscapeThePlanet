@@ -1,75 +1,94 @@
 // Created by Qusai Fannoun
-// this script must be attached to the shield slide object in the scene editor
+// This script must be attached to the shield slider object in the scene editor
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class ShieldUIObserver : MonoBehaviour,  IUIObserver<ShieldManager>
+public class ShieldUIObserver : MonoBehaviour, IUIObserver<ShieldManager>
 {
+    [Header("UI References")]
+    [SerializeField] private Slider shieldSlider;
+    [SerializeField] private TextMeshProUGUI shieldText;
+    
     private ShieldManager shieldManager;
-    [SerializeField] Slider ShieldSlider;
-    [SerializeField] TextMeshProUGUI ShieldText;
+    private bool isRegistered = false;
 
     private void Awake()
     {
-        shieldManager = GameObject.FindObjectOfType<ShieldManager>();
-        if (shieldManager != null)
+        // Validate UI components
+        if (shieldSlider == null)
         {
-            // this will subscribe the observer to the player
-            shieldManager.AddObserver(this);
-            shieldManager.NotifyObservers(UIState.ShieldChanged);
+            Debug.LogError("ShieldSlider is not assigned in ShieldUIObserver!");
+            enabled = false;
+            return;
         }
-        else
+
+        if (shieldText == null)
         {
-            Debug.LogError("Player not found.");
+            Debug.LogError("ShieldText is not assigned in ShieldUIObserver!");
+            enabled = false;
+            return;
         }
+    }
+
+    private void Start()
+    {
+        // Register with manager in Start() to ensure proper initialization order
+        RegisterWithManager();
+    }
+
+    private void RegisterWithManager()
+    {
+        if (isRegistered) return;
+
+        // Cache component reference for better performance
+        shieldManager = FindObjectOfType<ShieldManager>();
+        
+        if (shieldManager == null)
+        {
+            Debug.LogError("ShieldManager not found in scene!");
+            enabled = false;
+            return;
+        }
+
+        // Subscribe the observer to the shield manager
+        shieldManager.AddObserver(this);
+        shieldManager.NotifyObservers(UIState.ShieldChanged);
+        isRegistered = true;
+        
+        Debug.Log("ShieldUIObserver registered successfully!");
     }
 
     public void OnStateChange(ShieldManager shieldManager, UIState state)
     {
         if (state == UIState.ShieldChanged)
         {
-            // Debug.Log($"I am notified of {this} and I am Shield UI Observer.");
-            UpdateShieldUi(shieldManager);
+            UpdateShieldUI(shieldManager);
         }
     }
 
-    private void UpdateShieldUi(ShieldManager shieldManager)
+    private void UpdateShieldUI(ShieldManager shieldManager)
     {
-        ShieldSlider.maxValue = shieldManager.ShieldMaxTime;
-        ShieldSlider.value = shieldManager.CurrentShieldTime;
-        ShieldText.text = (Mathf.Round(shieldManager.CurrentShieldTime * 100.00f) * 0.01f).ToString() + "/" + shieldManager.ShieldMaxTime.ToString();
+        if (shieldSlider == null || shieldText == null || shieldManager == null)
+        {
+            Debug.LogWarning("UI components or ShieldManager is null in UpdateShieldUI!");
+            return;
+        }
+
+        try
+        {
+            shieldSlider.maxValue = shieldManager.ShieldMaxTime;
+            shieldSlider.value = shieldManager.CurrentShieldTime;
+            
+            // Format shield time display with proper rounding
+            float roundedTime = Mathf.Round(shieldManager.CurrentShieldTime * 100.0f) * 0.01f;
+            shieldText.text = $"{roundedTime:F2}/{shieldManager.ShieldMaxTime:F2}";
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error updating shield UI: {e.Message}");
+        }
     }
-
-
-    // public void OnPlayerStateChange(Player player, UIState state)
-    // {
-    //     if (state == UIState.ShieldChanged)
-    //     {
-    //         Debug.Log($"I am notified of {this} and I am Shield UI Observer.");
-    //         // UpdateShieldUi(player);
-    //     }
-    // }
-
-    // the observer will be notified when the player state changes
-    // the player state is not independent class so i must use Player.PlayerState
-    // public void OnPlayerStateChange(Player player, Player.PlayerState state)
-    // {
-    //     if (state == Player.PlayerState.ShieldChanged)
-    //     {
-    //         // Debug.Log($"I am notified of {this} and I am Shield UI Observer.");
-
-    //         UpdateShieldUi(player);
-    //     }
-    // }
-    // private void UpdateShieldUi(Player player)
-    // {
-    //     ShieldSlider.maxValue = player.GetShieldMaxTime();
-    //     ShieldSlider.value = player.GetCurrentShieldTime();
-    //     ShieldText.text = (Mathf.Round(player.GetCurrentShieldTime() * 100.00f) * 0.01f).ToString() + "/" + player.GetShieldMaxTime().ToString();
-    // }
-
-
 }

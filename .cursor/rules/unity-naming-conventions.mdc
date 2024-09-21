@@ -1,0 +1,53 @@
+# Unity/C# Naming Conventions
+
+## Class and Interface Names
+- Use **PascalCase** for class names: `PlayerController`, `GameManager`
+- Use **PascalCase** for interface names: `IDamageable`, `IInteractable`
+- Add descriptive suffixes: `Controller`, `Manager`, `Handler`, `System`
+- Use **nouns** for classes and **verbs** for interfaces
+
+## Method Names
+- Use **PascalCase** for public methods: `StartGame()`, `HandleInput()`
+- Use **camelCase** for private methods: `calculateDamage()`, `updatePosition()`
+- Use **descriptive verbs** that indicate the action
+- Avoid abbreviations unless widely understood
+
+## Variable Names
+- Use **camelCase** for private fields: `playerHealth`, `gameState`
+- Use **PascalCase** for public properties: `PlayerHealth`, `GameState`
+- Use **descriptive names** that indicate purpose
+- Add type suffixes when helpful: `playerTransform`, `enemyList`
+
+## Constants and Static Fields
+- Use **PascalCase** with underscores: `MAX_PLAYER_HEALTH`, `DEFAULT_SPEED`
+- Use **PascalCase** for static fields: `Instance`, `DefaultSettings`
+- Make constants **readonly** when possible
+
+## Unity-Specific Naming
+- Use **PascalCase** for MonoBehaviour methods: `Start()`, `Update()`, `OnTriggerEnter()`
+- Use **camelCase** for Unity event methods: `onPlayerDeath()`, `onLevelComplete()`
+- Use **PascalCase** for ScriptableObject assets: `PlayerData`, `WeaponSettings`
+- Use **descriptive names** for GameObjects and components
+
+## File and Folder Names
+- Use **PascalCase** for script files: `PlayerController.cs`, `GameManager.cs`
+- Use **PascalCase** for folders: `Scripts/`, `Prefabs/`, `Materials/`
+- Group related files in **descriptive folders**
+- Use **consistent folder structure** across the project
+
+## Component and GameObject Names
+- Use **descriptive names** for GameObjects: `Player`, `EnemySpawner`, `UI_HealthBar`
+- Use **PascalCase** for component names in code
+- Use **clear, hierarchical names** for complex objects
+- Add **prefixes/suffixes** for clarity: `UI_`, `_Prefab`, `_Instance`
+
+## Best Practices
+- **Be consistent** across the entire project
+- Use **self-documenting names** that require no comments
+- **Avoid single-letter variables** except in loops
+- Use **plural names** for collections: `enemies`, `weapons`
+- **Document any deviations** from these conventions
+description:
+globs:
+alwaysApply: true
+---

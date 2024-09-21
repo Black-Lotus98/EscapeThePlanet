@@ -3421,7 +3421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextLevel: Level02
   levelToReach: 2
-  starsList: []
+  saveManager: {fileID: 0}
 --- !u!1001 &2237035213238449402
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3646,9 +3646,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d4fefdce3cda848b77df4605a6e449, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPaused: 0
-  PauseMenuObj: {fileID: 404371012}
-  HowToPlayPanel: {fileID: 1885022896}
+  isPaused: 0
+  pauseMenuObj: {fileID: 404371012}
+  howToPlayPanel: {fileID: 1885022896}
 --- !u!82 &6322819113474780887
 AudioSource:
   m_ObjectHideFlags: 0

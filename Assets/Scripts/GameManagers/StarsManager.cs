@@ -5,16 +5,33 @@ using UnityEngine.SceneManagement;
 
 public class StarsManager : UIManager, IUIObservable<StarsManager>
 {
-    int collectedStarsCounter = 0;
-    [SerializeField] AudioClip starCollectableSound;
+    [Header("Star Settings")]
+    [SerializeField] private AudioClip starCollectableSound;
+    
+    private int collectedStarsCounter = 0;
+    private const int MAX_STARS = 3;
 
-
-    void Start()
+    private void Start()
     {
-        LevelData currentLevelData = GetLevelData(saveDataManager.Load());
-        saveDataManager.TempCollectedStars = currentLevelData.collectedStars;
-        currentLevelData.collectedStars = 0;
+        if (saveDataManager == null)
+        {
+            Debug.LogError("SaveDataManager is null in StarsManager!");
+            return;
+        }
 
+        try
+        {
+            LevelData currentLevelData = GetLevelData(saveDataManager.Load());
+            if (currentLevelData != null)
+            {
+                saveDataManager.TempCollectedStars = currentLevelData.collectedStars;
+                currentLevelData.collectedStars = 0;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error initializing StarsManager: {e.Message}");
+        }
     }
 
     public int CollectedStarsCounter
@@ -22,18 +39,42 @@ public class StarsManager : UIManager, IUIObservable<StarsManager>
         get { return collectedStarsCounter; }
         set
         {
-            if (collectedStarsCounter < 3)
+            if (collectedStarsCounter >= MAX_STARS)
+            {
+                Debug.LogWarning("Maximum stars already collected!");
+                return;
+            }
+
+            if (value <= 0)
+            {
+                Debug.LogWarning("Invalid star value provided!");
+                return;
+            }
+
+            try
             {
                 LevelData currentLevelData = GetLevelData(saveDataManager.Load());
-                collectedStarsCounter += value;
-                saveDataManager.SaveCollectedStar();
-                AS.PlayOneShot(starCollectableSound);
-                NotifyObservers(UIState.StarsState);
-
+                if (currentLevelData != null)
+                {
+                    collectedStarsCounter += value;
+                    saveDataManager.SaveCollectedStar();
+                    
+                    if (AS != null && starCollectableSound != null)
+                    {
+                        AS.PlayOneShot(starCollectableSound);
+                    }
+                    
+                    NotifyObservers(UIState.StarsState);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error collecting star: {e.Message}");
             }
         }
     }
-    List<IUIObserver<StarsManager>> observers = new List<IUIObserver<StarsManager>>();
+
+    private readonly List<IUIObserver<StarsManager>> observers = new List<IUIObserver<StarsManager>>();
 
     public void AddObserver(IUIObserver<StarsManager> observer)
     {
@@ -53,10 +94,17 @@ public class StarsManager : UIManager, IUIObservable<StarsManager>
 
     public new void NotifyObservers(UIState state)
     {
+        Debug.Log($"StarsManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
-            observer.OnStateChange(this, state);
+            if (observer != null)
+            {
+                observer.OnStateChange(this, state);
+            }
+            else
+            {
+                Debug.LogWarning("Null observer found in StarsManager observers list!");
+            }
         }
     }
-
 }

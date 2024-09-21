@@ -1,0 +1,52 @@
+# Unity Project Structure Guidelines
+
+## Asset Organization
+- **Group assets by type**: Scripts/, Prefabs/, Materials/, Audio/, etc.
+- **Use descriptive folder names**: `PlayerScripts/`, `EnemyScripts/`, `UI_Scripts/`
+- **Separate runtime and editor scripts**: `Scripts/` vs `Editor/`
+- **Organize by feature**: `Combat/`, `Movement/`, `UI/`, `Audio/`
+- **Use consistent naming**: PascalCase for folders and files
+
+## Script Organization
+- **Group related scripts** in feature folders: `Player/`, `Enemy/`, `Weapons/`
+- **Separate managers** into `GameManagers/` folder
+- **Use pattern folders** for architectural patterns: `Observer/`, `State/`, `Command/`
+- **Keep utility scripts** in `Utilities/` or `Helpers/`
+- **Organize by responsibility**: `Controllers/`, `Data/`, `Systems/`
+
+## Prefab Organization
+- **Group by type**: `Player/`, `Enemies/`, `UI/`, `Environment/`
+- **Use descriptive names**: `Player_Base`, `Enemy_Melee`, `UI_HealthBar`
+- **Create variants** with clear naming: `Player_Variant1`, `Enemy_Strong`
+- **Organize by scene**: `Level1/`, `Level2/`, `Menu/`
+- **Use subfolders** for complex prefab hierarchies
+
+## Scene Organization
+- **Use descriptive scene names**: `MainMenu`, `Level1_Desert`, `Level2_Space`
+- **Group scenes by type**: `Menus/`, `Levels/`, `Tutorials/`
+- **Use consistent naming** across all scenes
+- **Organize by difficulty** or progression: `Tutorial/`, `Easy/`, `Hard/`
+
+## Material and Texture Organization
+- **Group by material type**: `Characters/`, `Environment/`, `UI/`
+- **Use descriptive names**: `Player_Skin`, `Metal_Rusty`, `UI_Button`
+- **Organize textures** with materials: `Textures/Characters/`, `Textures/Environment/`
+- **Use consistent naming** for material variants
+
+## Audio Organization
+- **Group by type**: `Music/`, `SFX/`, `Voice/`
+- **Organize by context**: `Player/`, `Enemy/`, `UI/`, `Environment/`
+- **Use descriptive names**: `Player_Jump`, `Enemy_Death`, `UI_Click`
+- **Separate music and sound effects** clearly
+
+## Best Practices
+- **Maintain consistent structure** across the entire project
+- **Use clear, descriptive names** for all assets
+- **Group related assets** together in logical folders
+- **Avoid deep nesting** - keep folder structure manageable
+- **Document any deviations** from the established structure
+- **Review and refactor** structure as the project grows
+description:
+globs:
+alwaysApply: true
+---

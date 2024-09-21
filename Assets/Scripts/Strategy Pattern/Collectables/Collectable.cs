@@ -11,6 +11,7 @@ public abstract class Collectable<T> : MonoBehaviour where T : UIManager
     // This is a part of the strategy pattern, it will be used to determine the type of collectable
     protected ICollectibleBehavior<T> collectibleBehavior;
 
+    // This is the default behavior of the collectable
     private void OnTriggerEnter(Collider other)
     {
         var manager = other.GetComponent<T>();

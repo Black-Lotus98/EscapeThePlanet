@@ -4,19 +4,25 @@ using UnityEngine;
 
 public class ToggleShield : Command
 {
-    ShieldManager shieldManager;
-    AudioClip shieldActivationSound;
+    private readonly ShieldManager shieldManager;
+    private readonly AudioClip shieldActivationSound;
 
-    public ToggleShield(ShieldManager aShieldManager, AudioClip aShieldActivationSound)
+    public ToggleShield(ShieldManager shieldManager, AudioClip shieldActivationSound)
     {
-        this.shieldManager = aShieldManager;
-        this.shieldActivationSound = aShieldActivationSound;
+        this.shieldManager = shieldManager;
+        this.shieldActivationSound = shieldActivationSound;
     }
 
     public override void Execute(Rigidbody rigidbody, AudioSource audioSource)
     {
-        shieldManager.ToggleShield();
-        shieldManager.NotifyObservers(UIState.ShieldChanged);
+        if (shieldManager != null)
+        {
+            shieldManager.ToggleShield();
+            shieldManager.NotifyObservers(UIState.ShieldChanged);
+        }
+        else
+        {
+            Debug.LogWarning("ShieldManager is null in ToggleShield command.");
+        }
     }
-
 }

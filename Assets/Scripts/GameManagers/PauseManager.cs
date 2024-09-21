@@ -4,17 +4,23 @@ using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityEngine.UI;
 
-
 public class PauseManager : MonoBehaviour
 {
-    public bool IsPaused;
+    [Header("Pause Settings")]
+    [SerializeField] private bool isPaused = false;
+    
+    [Header("UI References")]
+    [SerializeField] private GameObject pauseMenuObj;
+    [SerializeField] private GameObject howToPlayPanel;
+    
+    private bool toggle = true;
+    private Canvas gameCanvas;
 
-    public GameObject PauseMenuObj;
-    public GameObject HowToPlayPanel;
-    bool toggle = true;
-
-
-
+    public bool IsPaused
+    {
+        get { return isPaused; }
+        private set { isPaused = value; }
+    }
 
     private void Start()
     {
@@ -22,6 +28,37 @@ public class PauseManager : MonoBehaviour
         {
             Unpause();
         }
+        
+        // Auto-assign UI references from Canvas prefab
+        AutoAssignUIReferences();
+    }
+
+    private void AutoAssignUIReferences()
+    {
+        // Find the Canvas in the scene (should be the prefab)
+        gameCanvas = FindObjectOfType<Canvas>();
+        
+        if (gameCanvas == null)
+        {
+            Debug.LogError("Canvas not found in scene!");
+            return;
+        }
+
+        // Find PauseMenu within the Canvas
+        pauseMenuObj = gameCanvas.transform.Find("PauseMenu")?.gameObject;
+        if (pauseMenuObj == null)
+        {
+            Debug.LogError("PauseMenu not found in Canvas!");
+        }
+
+        // Find HowToPlayPanel within the Canvas
+        howToPlayPanel = gameCanvas.transform.Find("HowToPlayPanel")?.gameObject;
+        if (howToPlayPanel == null)
+        {
+            Debug.LogError("HowToPlayPanel not found in Canvas!");
+        }
+
+        Debug.Log("UI references auto-assigned successfully!");
     }
 
     public void ExitToMainMenu()
@@ -33,6 +70,7 @@ public class PauseManager : MonoBehaviour
     {
         Unpause();
     }
+    
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape) || CrossPlatformInputManager.GetButtonDown("Pause"))
@@ -56,10 +94,19 @@ public class PauseManager : MonoBehaviour
     public void Unpause()
     {
         Time.timeScale = 1f;
-        PauseMenuObj.SetActive(false);
-        HowToPlayPanel.SetActive(false);
+        
+        if (pauseMenuObj != null)
+        {
+            pauseMenuObj.SetActive(false);
+        }
+        
+        if (howToPlayPanel != null)
+        {
+            howToPlayPanel.SetActive(false);
+        }
 
         IsPaused = false;
+        
         if (toggle)
         {
             AudioListener.volume = 1f;
@@ -74,7 +121,12 @@ public class PauseManager : MonoBehaviour
             AudioListener.volume = 0f;
             toggle = !toggle;
         }
-        PauseMenuObj.SetActive(true);
+        
+        if (pauseMenuObj != null)
+        {
+            pauseMenuObj.SetActive(true);
+        }
+        
         IsPaused = true;
 
         // Freeze time
@@ -93,14 +145,12 @@ public class PauseManager : MonoBehaviour
 
     public void ToggleHowToPlayPanel()
     {
-        if (HowToPlayPanel.activeInHierarchy)
+        if (howToPlayPanel == null)
         {
-            HowToPlayPanel.SetActive(false);
-        }
-        else
-        {
-            HowToPlayPanel.SetActive(true);
+            Debug.LogWarning("HowToPlayPanel is not assigned!");
+            return;
         }
 
+        howToPlayPanel.SetActive(!howToPlayPanel.activeInHierarchy);
     }
 }

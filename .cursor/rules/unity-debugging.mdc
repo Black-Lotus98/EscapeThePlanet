@@ -1,0 +1,54 @@
+# Unity Debugging & Error Handling Guidelines
+
+## Debug Logging
+- Use **Debug.Log()** for general information messages
+- Use **Debug.LogWarning()** for non-critical issues that should be addressed
+- Use **Debug.LogError()** for critical errors that need immediate attention
+- Use **Debug.LogFormat()** for formatted messages with parameters
+- Implement **conditional compilation** with [System.Diagnostics.Conditional("UNITY_EDITOR")]
+
+## Error Handling
+- Implement **try-catch blocks** for file I/O operations
+- Use **try-catch** for network operations and API calls
+- Handle **null reference exceptions** with proper null checks
+- Use **Unity's assertion system** (Debug.Assert) for logical errors
+- Implement **graceful degradation** for non-critical features
+
+## Performance Debugging
+- Use **Unity Profiler** to identify performance bottlenecks
+- Use **Frame Debugger** to analyze rendering issues
+- Implement **custom profiling** with Profiler.BeginSample() and Profiler.EndSample()
+- Use **Debug.Log** with Time.time to track timing issues
+- Monitor **memory usage** with Profiler.GetTotalAllocatedMemoryLong()
+
+## Visual Debugging
+- Use **Gizmos** for scene view debugging (OnDrawGizmos, OnDrawGizmosSelected)
+- Implement **debug visualizations** for complex systems
+- Use **Debug.DrawLine()** and **Debug.DrawRay()** for trajectory debugging
+- Create **debug UI elements** for runtime inspection
+- Use **Editor-only debug features** with #if UNITY_EDITOR
+
+## Code Quality
+- Use **Debug.Assert()** to catch logical errors during development
+- Implement **input validation** for public methods
+- Use **Debug.LogWarning()** for deprecated method usage
+- Add **debug comments** for complex algorithms
+- Use **region directives** to organize debug code
+
+## Testing & Validation
+- Use Unity's **built-in testing framework** for unit tests
+- Implement **integration tests** for complex systems
+- Use **Debug.Log()** in test methods to verify expected behavior
+- Create **debug builds** with additional logging
+- Use **Editor scripts** for automated testing
+
+## Best Practices
+- **Remove debug logs** before production builds
+- Use **conditional compilation** to exclude debug code from builds
+- Implement **proper error messages** with context information
+- Use **structured logging** for complex debugging scenarios
+- **Document debug procedures** for team members
+description:
+globs:
+alwaysApply: false
+---

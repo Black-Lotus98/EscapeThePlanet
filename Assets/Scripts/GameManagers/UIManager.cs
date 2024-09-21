@@ -4,24 +4,37 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// public class UIManager : Singleton<UIManager>, IUIObservable
 public class UIManager : MonoBehaviour, IUIObservable<UIManager>
 {
-    public AudioSource AS;
-    public AudioSource CollectableAS;
-    public SaveDataManager saveDataManager;
-    public InputHandler inputHandler;
+    [Header("Audio Sources")]
+    [SerializeField] protected AudioSource AS;
+    [SerializeField] protected AudioSource CollectableAS;
+    
+    [Header("References")]
+    [SerializeField] protected SaveDataManager saveDataManager;
+    [SerializeField] private InputHandler inputHandler;
+
+    // Cached components for better performance
+    private GameObject playerObject;
+    private GameObject gameMasterObject;
 
     // Observers List
-    private List<IUIObserver<UIManager>> observers = new List<IUIObserver<UIManager>>();
+    private readonly List<IUIObserver<UIManager>> observers = new List<IUIObserver<UIManager>>();
+    
     public void AddObserver(IUIObserver<UIManager> observer)
     {
-        observers.Add(observer);
+        if (!observers.Contains(observer))
+        {
+            observers.Add(observer);
+        }
     }
 
     public void RemoveObserver(IUIObserver<UIManager> observer)
     {
-        observers.Remove(observer);
+        if (observers.Contains(observer))
+        {
+            observers.Remove(observer);
+        }
     }
 
     public void NotifyObservers(UIState state)
@@ -32,47 +45,62 @@ public class UIManager : MonoBehaviour, IUIObservable<UIManager>
         }
     }
 
-
-    void Start()
+    private void Start()
     {
+        // Cache components once
+        CacheComponents();
+        
+        // Initialize UI state
         NotifyObservers(UIState.ShieldChanged);
         NotifyObservers(UIState.FuelChanged);
         NotifyObservers(UIState.StarsState);
         NotifyObservers(UIState.KeyState);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         FindSources();
     }
 
-    void Update()
+    private void Update()
     {
-        if (GameObject.FindGameObjectWithTag("Player") != null)
+        // Only check if player exists and input handler is disabled
+        if (playerObject != null && inputHandler != null && !inputHandler.enabled)
         {
-
-            if (!inputHandler.GetComponent<InputHandler>().enabled)
+            if (AS != null && AS.isPlaying)
             {
                 AS.Stop();
             }
         }
     }
 
+    private void CacheComponents()
+    {
+        // Cache player object once
+        playerObject = GameObject.FindGameObjectWithTag("Player");
+        
+        // Cache game master object once
+        gameMasterObject = GameObject.FindGameObjectWithTag("GameMaster");
+        
+        // Get SaveDataManager instance
+        saveDataManager = SaveDataManager.Instance;
+    }
+
     protected LevelData GetLevelData(GameData gameData)
     {
         var sceneData = SceneManager.GetActiveScene();
 
-        // using .buildIndex to get the scene index and .name to get the scene name
+        // Using .buildIndex to get the scene index and .name to get the scene name
         var currentLevelData = gameData.levelData.Where(x => x.currentLevelIndex == sceneData.buildIndex).FirstOrDefault();
         if (currentLevelData == null)
         {
@@ -81,14 +109,19 @@ public class UIManager : MonoBehaviour, IUIObservable<UIManager>
         return currentLevelData;
     }
 
-    protected void FindSources()
+    private void FindSources()
     {
-
-        var gameMaster = GameObject.FindGameObjectWithTag("GameMaster");
-        if (gameMaster != null)
+        // Cache game master reference
+        if (gameMasterObject == null)
         {
-            AS = gameMaster.gameObject.GetComponent<AudioSource>();
-            CollectableAS = gameMaster.gameObject.GetComponent<AudioSource>();
+            gameMasterObject = GameObject.FindGameObjectWithTag("GameMaster");
+        }
+        
+        if (gameMasterObject != null)
+        {
+            AS = gameMasterObject.GetComponent<AudioSource>();
+            CollectableAS = gameMasterObject.GetComponent<AudioSource>();
+            
             if (AS == null || CollectableAS == null)
             {
                 Debug.LogError("AudioSource components not found on GameMaster.");
@@ -98,16 +131,22 @@ public class UIManager : MonoBehaviour, IUIObservable<UIManager>
         {
             Debug.LogError("GameMaster object not found.");
         }
-        if (GameObject.FindGameObjectWithTag("Player") != null)
+        
+        // Cache player reference
+        if (playerObject == null)
         {
-            inputHandler = GameObject.FindGameObjectWithTag("Player").gameObject.GetComponent<InputHandler>();
+            playerObject = GameObject.FindGameObjectWithTag("Player");
         }
-        if (GameObject.Find("SaveDataManager") != null)
+        
+        if (playerObject != null)
         {
-            // saveDataManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
-
+            inputHandler = playerObject.GetComponent<InputHandler>();
+        }
+        
+        // Get SaveDataManager instance
+        if (saveDataManager == null)
+        {
             saveDataManager = SaveDataManager.Instance;
         }
     }
-
 }

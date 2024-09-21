@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class StopRotation : Command
 {
-    private ParticleSystem leftThrustParticles;
-    private ParticleSystem rightThrustParticles;
+    private readonly ParticleSystem leftThrustParticles;
+    private readonly ParticleSystem rightThrustParticles;
 
     public StopRotation(ParticleSystem leftThrustParticles, ParticleSystem rightThrustParticles)
     {
@@ -15,7 +15,16 @@ public class StopRotation : Command
 
     public override void Execute(Rigidbody rigidbody, AudioSource audioSource)
     {
-        leftThrustParticles.Stop();
-        rightThrustParticles.Stop();
+        // Stop left thrust particles
+        if (leftThrustParticles != null && leftThrustParticles.isPlaying)
+        {
+            leftThrustParticles.Stop();
+        }
+        
+        // Stop right thrust particles
+        if (rightThrustParticles != null && rightThrustParticles.isPlaying)
+        {
+            rightThrustParticles.Stop();
+        }
     }
 }

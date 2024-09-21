@@ -6,43 +6,101 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    bool levelIsOver = false;
-    public string nextLevel;
-    public int levelToReach;
-    public List<Star> starsList = new List<Star>();
-    SaveDataManager saveManager;
+    [Header("Level Settings")]
+    [SerializeField] private string nextLevel;
+    [SerializeField] private int levelToReach;
+    
+    [Header("References")]
+    [SerializeField] private SaveDataManager saveManager;
+    
+    private bool levelIsOver = false;
+    private readonly List<Star> starsList = new List<Star>();
+    
     public bool LevelIsOver
     {
-        get { return this.levelIsOver; }
-        set { this.levelIsOver = value; }
+        get { return levelIsOver; }
+        set { levelIsOver = value; }
     }
 
     private void Start()
     {
-        // This will look for the save data manager in the scene, but since we are using the singleton pattern,
-        // we don't need it because we can access it globally
-        // saveManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
-
+        // Get SaveDataManager instance
         saveManager = SaveDataManager.Instance;
-
-        var starts = GameObject.FindGameObjectsWithTag("StarCollectable");
-        foreach (var star in starts)
+        
+        if (saveManager == null)
         {
-            starsList.Add(star.GetComponent<Star>());
+            Debug.LogError("SaveDataManager instance not found!");
+            return;
         }
 
-        var levelData = saveManager.Load().levelData.Where(x => x.currentLevelIndex == PlayerPrefs.GetInt("levelReached")).FirstOrDefault();
-        // levelData.collectedStars = saveManager.GetCollectedStars();
-        // Debug.Log($"Collected Stars: {saveManager.GetCollectedStars()}");
-
-        GetComponent<SaveDataManager>();
-        // Debug.Log($"Level Reached: {PlayerPrefs.GetInt("levelReached")}");
+        // Cache star objects once
+        CacheStarObjects();
+        
+        // Load level data
+        LoadLevelData();
+        
+        // Initialize level state
         LevelIsOver = false;
     }
+
+    private void CacheStarObjects()
+    {
+        var starObjects = GameObject.FindGameObjectsWithTag("StarCollectable");
+        
+        if (starObjects.Length == 0)
+        {
+            Debug.LogWarning("No star collectables found in scene.");
+            return;
+        }
+        
+        foreach (var starObject in starObjects)
+        {
+            if (starObject != null)
+            {
+                var starComponent = starObject.GetComponent<Star>();
+                if (starComponent != null)
+                {
+                    starsList.Add(starComponent);
+                }
+                else
+                {
+                    Debug.LogWarning($"Star component not found on {starObject.name}");
+                }
+            }
+        }
+        
+        Debug.Log($"Cached {starsList.Count} star objects.");
+    }
+
+    private void LoadLevelData()
+    {
+        try
+        {
+            var currentLevelIndex = PlayerPrefs.GetInt("levelReached", 1);
+            var gameData = saveManager.Load();
+            
+            if (gameData?.levelData != null)
+            {
+                var levelData = gameData.levelData.FirstOrDefault(x => x.currentLevelIndex == currentLevelIndex);
+                
+                if (levelData == null)
+                {
+                    Debug.LogWarning($"Level data not found for level {currentLevelIndex}");
+                }
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error loading level data: {e.Message}");
+        }
+    }
+
     public void WinLevel()
     {
         LevelIsOver = true;
-        if (PlayerPrefs.GetInt("levelReached") < levelToReach)
+        
+        var currentLevelReached = PlayerPrefs.GetInt("levelReached", 1);
+        if (currentLevelReached < levelToReach)
         {
             PlayerPrefs.SetInt("levelReached", levelToReach);
         }
@@ -50,7 +108,11 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        saveManager.ResetCollectedStars();
+        if (saveManager != null)
+        {
+            saveManager.ResetCollectedStars();
+        }
+        
         PlayerPrefs.SetInt("levelReached", 1);
         LevelIsOver = false;
     }

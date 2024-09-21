@@ -7,22 +7,23 @@ using UnityStandardAssets.CrossPlatformInput;
 public class ShieldManager : UIManager, IUIObservable<ShieldManager>
 {
     [Header("Shield Settings")]
-    [SerializeField] bool shieldAllowed = false;
-    [SerializeField] GameObject shield;
-    [SerializeField] AudioClip shieldActivationSound;
-    [SerializeField] AudioClip shieldCollectableSound;
-    [SerializeField] float shieldMaxTime;
-    [SerializeField] float currentShieldTime;
-    bool shieldIsActive = false;
+    [SerializeField] private bool shieldAllowed = false;
+    [SerializeField] private GameObject shield;
+    [SerializeField] private AudioClip shieldActivationSound;
+    [SerializeField] private AudioClip shieldCollectableSound;
+    [SerializeField] private float shieldMaxTime;
+    [SerializeField] private float currentShieldTime;
+    
+    private bool shieldIsActive = false;
 
     public float ShieldMaxTime
     {
-        get { return this.shieldMaxTime; }
+        get { return shieldMaxTime; }
     }
 
     public float CurrentShieldTime
     {
-        get { return this.currentShieldTime; }
+        get { return currentShieldTime; }
         set
         {
             if (currentShieldTime != value)
@@ -35,76 +36,81 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>
 
     public bool ShieldAllowed
     {
-        get
-        {
-            return shieldAllowed;
-        }
-        // set
-        // {
-        //     if (shieldAllowed != value)
-        //     {
-        //         shieldAllowed = value;
-        //         NotifyObservers(UIState.ShieldChanged);
-        //     }
-        // }
+        get { return shieldAllowed; }
     }
+    
     public bool ShieldIsActive
     {
-        get { return this.shieldIsActive; }
+        get { return shieldIsActive; }
     }
 
     public void ToggleShield()
     {
-        if (shieldAllowed)
+        if (!shieldAllowed || shield == null)
         {
-            shieldIsActive = !shieldIsActive;
-            if (currentShieldTime > 0.0f)
+            if (shield != null)
             {
-                if (shieldIsActive)
+                shield.SetActive(false);
+            }
+            return;
+        }
+
+        shieldIsActive = !shieldIsActive;
+        
+        if (currentShieldTime > 0.0f)
+        {
+            if (shieldIsActive)
+            {
+                shield.SetActive(true);
+                if (AS != null && shieldActivationSound != null)
                 {
-                    shield.SetActive(true);
                     AS.PlayOneShot(shieldActivationSound);
-                }
-                else
-                {
-                    AS.Stop();
-                    shield.SetActive(false);
                 }
             }
             else
             {
+                if (AS != null && AS.isPlaying)
+                {
+                    AS.Stop();
+                }
                 shield.SetActive(false);
             }
         }
         else
         {
             shield.SetActive(false);
+            shieldIsActive = false;
         }
     }
 
     private void Update()
     {
+        // Only process if shield exists and is active
+        if (shield == null || !shield.activeInHierarchy)
         {
-            if (shield.activeInHierarchy)
+            return;
+        }
+
+        if (currentShieldTime > 0.0f)
+        {
+            currentShieldTime -= Time.deltaTime;
+            NotifyObservers(UIState.ShieldChanged);
+        }
+        else
+        {
+            // Shield time depleted
+            if (AS != null && AS.isPlaying)
             {
-                if (currentShieldTime > 0.0f)
-                {
-                    currentShieldTime -= Time.deltaTime;
-                    NotifyObservers(UIState.ShieldChanged);
-                }
-                else
-                {
-                    AS.Stop();
-                    currentShieldTime = 0.0f;
-                    shield.SetActive(false);
-                    NotifyObservers(UIState.ShieldChanged);
-                }
+                AS.Stop();
             }
+            currentShieldTime = 0.0f;
+            shield.SetActive(false);
+            shieldIsActive = false;
+            NotifyObservers(UIState.ShieldChanged);
         }
     }
 
-
-    private List<IUIObserver<ShieldManager>> observers = new List<IUIObserver<ShieldManager>>();
+    private readonly List<IUIObserver<ShieldManager>> observers = new List<IUIObserver<ShieldManager>>();
 
     public void AddObserver(IUIObserver<ShieldManager> observer)
     {
@@ -124,20 +130,28 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>
 
     public new void NotifyObservers(UIState state)
     {
+        Debug.Log($"ShieldManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
-            observer.OnStateChange(this, state);
+            if (observer != null)
+            {
+                observer.OnStateChange(this, state);
+            }
+            else
+            {
+                Debug.LogWarning("Null observer found in ShieldManager observers list!");
+            }
         }
     }
 
     public void IncreaseShieldTime(float amount)
     {
-        CollectableAS.PlayOneShot(shieldCollectableSound);
+        if (CollectableAS != null && shieldCollectableSound != null)
+        {
+            CollectableAS.PlayOneShot(shieldCollectableSound);
+        }
+        
         currentShieldTime += amount;
         NotifyObservers(UIState.ShieldChanged);
-        // ShieldAllowed = true;
     }
-
-
-
 }

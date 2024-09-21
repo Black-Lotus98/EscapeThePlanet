@@ -1,0 +1,53 @@
+# Unity Performance Optimization Guidelines
+
+## Object Pooling
+- Use **object pooling** for frequently instantiated/destroyed objects (bullets, particles, enemies)
+- Implement pool managers for different object types
+- Pre-allocate objects during scene loading or game initialization
+- Return objects to pool instead of destroying them
+
+## Rendering Optimization
+- **Batch draw calls** by using shared materials and textures
+- Use **sprite atlases** for UI elements and 2D sprites
+- Implement **LOD (Level of Detail)** systems for complex 3D models
+- Use **occlusion culling** for large scenes
+- Minimize **overdraw** by organizing transparent objects properly
+
+## Physics Optimization
+- Use **simplified collision meshes** for complex objects
+- Adjust **fixed timestep** settings for optimal physics performance
+- Use **trigger colliders** instead of physics colliders when possible
+- Implement **spatial partitioning** for large numbers of physics objects
+- Use **physics layers** to limit unnecessary collision checks
+
+## Memory Management
+- **Cache component references** in Start() or Awake() instead of GetComponent() in Update()
+- Use **object pooling** to avoid garbage collection spikes
+- Minimize **string allocations** in performance-critical code
+- Use **structs** for small, frequently accessed data
+- Implement **proper disposal** of resources (textures, audio clips)
+
+## CPU Optimization
+- Use Unity's **Job System** for CPU-intensive operations
+- Leverage **Burst Compiler** for mathematical operations
+- **Profile your code** using Unity Profiler to identify bottlenecks
+- Use **coroutines** instead of Update() for time-based operations
+- Implement **frame rate limiting** for consistent performance
+
+## Asset Management
+- Use **asset bundles** for efficient resource loading
+- Implement **asynchronous loading** for large assets
+- **Compress textures** appropriately for target platforms
+- Use **mipmaps** for 3D textures
+- Implement **texture streaming** for large textures
+
+## Code Optimization
+- Avoid **GetComponent()** calls in Update() loops
+- Use **local variables** instead of repeated property access
+- Implement **early returns** to avoid unnecessary processing
+- Use **object pooling** for temporary objects
+- **Profile before optimizing** - measure first, optimize second 
+description:
+globs:
+alwaysApply: true
+---

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class StopThrust : Command
 {
-    private AudioClip mainEngine;
-    private ParticleSystem rocketBoostParticles;
+    private readonly AudioClip mainEngine;
+    private readonly ParticleSystem rocketBoostParticles;
 
     public StopThrust(AudioClip mainEngine, ParticleSystem rocketBoostParticles)
     {
@@ -15,7 +15,16 @@ public class StopThrust : Command
 
     public override void Execute(Rigidbody rigidbody, AudioSource audioSource)
     {
-        rocketBoostParticles.Stop();
-        audioSource.Stop();
+        // Stop particles
+        if (rocketBoostParticles != null && rocketBoostParticles.isPlaying)
+        {
+            rocketBoostParticles.Stop();
+        }
+        
+        // Stop audio
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 }

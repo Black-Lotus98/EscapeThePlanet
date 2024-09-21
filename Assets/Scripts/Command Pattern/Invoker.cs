@@ -6,14 +6,25 @@ public class Invoker
 {
     public void ExecuteCommand(Command command, Rigidbody rigidbody, AudioSource audioSource)
     {
-        if (command != null)
+        if (command == null)
+        {
+            Debug.LogWarning("Attempted to execute null command.");
+            return;
+        }
+        
+        if (rigidbody == null)
+        {
+            Debug.LogWarning("Rigidbody is null in command execution.");
+            return;
+        }
+        
+        try
         {
             command.Execute(rigidbody, audioSource);
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.Log($"Command is null");
+            Debug.LogError($"Error executing command: {e.Message}");
         }
     }
-
 }

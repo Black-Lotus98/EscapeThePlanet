@@ -6,26 +6,34 @@ using UnityEngine.SceneManagement;
 public class FuelManager : UIManager, IUIObservable<FuelManager>
 {
     [Header("Fuel Settings")]
-    [SerializeField] bool isUsingFuel = false;
-    [SerializeField] float fuelAmount;
-    [SerializeField] float maxFlightTime = 0;
-    [SerializeField] AudioClip fuelCollectableSound;
-
-
+    [SerializeField] private bool isUsingFuel = false;
+    [SerializeField] private float fuelAmount;
+    [SerializeField] private float maxFlightTime = 0;
+    [SerializeField] private AudioClip fuelCollectableSound;
 
     // Getters and Setters
     public bool IsUsingFuel
     {
-        get { return this.isUsingFuel; }
+        get { return isUsingFuel; }
     }
 
     public float FuelAmount
     {
-        get { return this.fuelAmount; }
-        set { this.fuelAmount = value; }
+        get { return fuelAmount; }
+        set 
+        { 
+            fuelAmount = Mathf.Clamp(value, 0, maxFlightTime);
+            NotifyObservers(UIState.FuelChanged);
+        }
     }
 
-    private List<IUIObserver<FuelManager>> observers = new List<IUIObserver<FuelManager>>();
+    public float MaxFlightTime
+    {
+        get { return maxFlightTime; }
+    }
+
+    private readonly List<IUIObserver<FuelManager>> observers = new List<IUIObserver<FuelManager>>();
+    
     public void AddObserver(IUIObserver<FuelManager> observer)
     {
         if (!observers.Contains(observer))
@@ -44,59 +52,77 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>
 
     public new void NotifyObservers(UIState state)
     {
+        Debug.Log($"FuelManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
-            observer.OnStateChange(this, state);
-        }
-    }
-    public void FuelConsumption(float amount)
-    {
-        if (IsUsingFuel)
-        {
-            if (FuelAmount <= 0)
+            if (observer != null)
             {
-                FuelAmount = 0;
+                observer.OnStateChange(this, state);
             }
             else
             {
-                FuelAmount -= amount * Time.deltaTime;
+                Debug.LogWarning("Null observer found in FuelManager observers list!");
             }
-            NotifyObservers(UIState.FuelChanged);
         }
     }
 
-    public float MaxFlightTime
+    public void FuelConsumption(float amount)
     {
-        get { return this.maxFlightTime; }
+        if (!IsUsingFuel)
+        {
+            return;
+        }
+
+        if (FuelAmount <= 0)
+        {
+            FuelAmount = 0;
+            return;
+        }
+
+        FuelAmount -= amount * Time.deltaTime;
     }
 
     public void FuelBarrel(int amount)
     {
-        if (FuelAmount > maxFlightTime)
+        if (amount <= 0)
+        {
+            return;
+        }
+
+        if (FuelAmount >= maxFlightTime)
         {
             FuelAmount = maxFlightTime;
+            return;
         }
-        else
+
+        if (CollectableAS != null && fuelCollectableSound != null)
         {
             CollectableAS.PlayOneShot(fuelCollectableSound);
-            FuelAmount += amount;
-
         }
-        NotifyObservers(UIState.FuelChanged);
+        
+        FuelAmount += amount;
     }
 
     public void ExecutePowerUp(ICollectibleBehavior<FuelManager> collectableBehaviour)
     {
+        if (collectableBehaviour == null)
+        {
+            Debug.LogWarning("CollectableBehaviour is null in ExecutePowerUp.");
+            return;
+        }
+
         collectableBehaviour.ExecutePowerUp(this);
-        NotifyObservers(UIState.FuelChanged);
     }
 
     public void RefillFuel(float refillSpeed)
     {
+        if (refillSpeed <= 0)
+        {
+            return;
+        }
+
         // Using the * refillSpeed to make the refill depend on how fast the player is refilling
         FuelAmount += Time.deltaTime * refillSpeed;
         isUsingFuel = true;
-        NotifyObservers(UIState.FuelChanged);
     }
-
 }

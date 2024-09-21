@@ -1657,7 +1657,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7777778, y: 1}
+    m_SensorSize: {x: 1.7769886, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2027,6 +2027,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1386743662, guid: 64fe9dff121604547918041653505075, type: 3}
+      propertyPath: fuelManager
+      value: 
+      objectReference: {fileID: 1936062212}
+    - target: {fileID: 1386743662, guid: 64fe9dff121604547918041653505075, type: 3}
+      propertyPath: refillAmount
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3683148457593480975, guid: 64fe9dff121604547918041653505075, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -2439,6 +2447,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f2cb78699dc14646b4e51cb7f2476ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1936062212 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1546177324, guid: 8f619fcf19d6c834b809053cdced79c9, type: 3}
+  m_PrefabInstance: {fileID: 1936062206}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccd264b5fef46f64e91640cc3c5656f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1962215725 stripped
@@ -5457,7 +5476,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   KeyImage: {fileID: 6106402037928346112}
   CollectedKey: {fileID: 21300000, guid: f147c2b287d910b48b2b66e50ce64283, type: 3}
-  DamagedKey: {fileID: 21300000, guid: 1462226ea19a2324586d8032bfa1bbf0, type: 3}
 --- !u!224 &6307947601624025344
 RectTransform:
   m_ObjectHideFlags: 0

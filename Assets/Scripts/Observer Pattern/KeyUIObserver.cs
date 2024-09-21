@@ -5,39 +5,85 @@ using UnityEngine.UI;
 
 public class KeyUIObserver : MonoBehaviour, IUIObserver<KeyManager>
 {
-
+    [Header("UI References")]
+    [SerializeField] private Image keyImage;
+    [SerializeField] private Sprite collectedKey;
+    
     private KeyManager keyManager;
-    [SerializeField] Image KeyImage;
-    [SerializeField] Sprite CollectedKey;
+    private bool isRegistered = false;
+
     private void Awake()
     {
-        keyManager = GameObject.FindObjectOfType<KeyManager>();
-        if (keyManager != null)
+        // Validate UI components
+        if (keyImage == null)
         {
-            // this will subscribe the observer to the player
-            keyManager.AddObserver(this);
-            keyManager.NotifyObservers(UIState.KeyState);
+            Debug.LogError("KeyImage is not assigned in KeyUIObserver!");
+            enabled = false;
+            return;
         }
-        else
+
+        if (collectedKey == null)
         {
-            Debug.LogError("Player not found.");
+            Debug.LogError("CollectedKey sprite is not assigned in KeyUIObserver!");
+            enabled = false;
+            return;
         }
     }
 
-    public void OnStateChange(KeyManager KeyManager, UIState state)
+    private void Start()
+    {
+        // Register with manager in Start() to ensure proper initialization order
+        RegisterWithManager();
+    }
+
+    private void RegisterWithManager()
+    {
+        if (isRegistered) return;
+
+        // Cache component reference for better performance
+        keyManager = FindObjectOfType<KeyManager>();
+        
+        if (keyManager == null)
+        {
+            Debug.LogError("KeyManager not found in scene!");
+            enabled = false;
+            return;
+        }
+
+        // Subscribe the observer to the key manager
+        keyManager.AddObserver(this);
+        keyManager.NotifyObservers(UIState.KeyState);
+        isRegistered = true;
+        
+        Debug.Log("KeyUIObserver registered successfully!");
+    }
+
+    public void OnStateChange(KeyManager keyManager, UIState state)
     {
         if (state == UIState.KeyState)
         {
-            // Debug.Log($"I am notified of {this} and I am Fuel UI Observer.");
-            UpdateKeyUI(KeyManager);
+            UpdateKeyUI(keyManager);
         }
     }
 
-    private void UpdateKeyUI(KeyManager aKeyManager)
+    private void UpdateKeyUI(KeyManager keyManager)
     {
-        if (aKeyManager.PlayerHasKey)
+        if (keyImage == null || keyManager == null)
         {
-            KeyImage.GetComponent<Image>().sprite = CollectedKey;
+            Debug.LogWarning("KeyImage or KeyManager is null in UpdateKeyUI!");
+            return;
+        }
+
+        try
+        {
+            if (keyManager.PlayerHasKey)
+            {
+                keyImage.sprite = collectedKey;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error updating key UI: {e.Message}");
         }
     }
 }
