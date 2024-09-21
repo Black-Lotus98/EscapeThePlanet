@@ -6,6 +6,6 @@ public class FuelPadCollisionState : MonoBehaviour, CollisionState
 {
     public void Handle(CollisionHandler context)
     {
-        // Debug.Log("You hit the fuel pad");
+        Debug.Log("You hit the fuel pad, FuelPadState");
     }
 }

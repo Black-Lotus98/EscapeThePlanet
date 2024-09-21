@@ -5,12 +5,8 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class MovementController : MonoBehaviour
 {
-
     public Rigidbody Rigidbdy { get; private set; }
     public AudioSource AS { get; private set; }
-
-
-    Player player;
 
     private void Start()
     {
@@ -18,6 +14,9 @@ public class MovementController : MonoBehaviour
         AS = GetComponent<AudioSource>();
     }
 
+
+
+    // Player player;
 
     // private void Update()
     // {

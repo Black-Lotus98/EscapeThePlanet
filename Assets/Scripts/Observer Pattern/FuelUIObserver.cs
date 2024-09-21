@@ -25,17 +25,6 @@ public class FuelUIObserver : MonoBehaviour, IUIObserver<FuelManager>
         }
     }
 
-    // the observer will be notified when the player state changes
-    // the player state is not independent class so i must use Player.PlayerState
-    // public void OnPlayerStateChange(Player player, Player.PlayerState state)
-    // {
-    //     if (state == Player.PlayerState.FuelChanged)
-    //     {
-    //         // Debug.Log($"I am notified of {this} and I am Fuel UI Observer.");
-    //         UpdateFuelUi(player);
-    //     }
-    // }
-
     public void OnStateChange(FuelManager fuelManager, UIState state)
     {
         if (state == UIState.FuelChanged)
@@ -50,4 +39,16 @@ public class FuelUIObserver : MonoBehaviour, IUIObserver<FuelManager>
         FuelSlider.maxValue = fuelManager.MaxFlightTime;
         FuelSlider.value = fuelManager.FuelAmount;
     }
+
+    // the observer will be notified when the player state changes
+    // the player state is not independent class so i must use Player.PlayerState
+    // public void OnPlayerStateChange(Player player, Player.PlayerState state)
+    // {
+    //     if (state == Player.PlayerState.FuelChanged)
+    //     {
+    //         // Debug.Log($"I am notified of {this} and I am Fuel UI Observer.");
+    //         UpdateFuelUi(player);
+    //     }
+    // }
+
 }
