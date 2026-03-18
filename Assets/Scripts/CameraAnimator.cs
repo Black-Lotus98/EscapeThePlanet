@@ -6,8 +6,14 @@ public class CameraAnimator : MonoBehaviour
 {
     [SerializeField] AnimationClip animClip;
 
-    void Update()
+    void Start()
     {
+        if (animClip == null)
+        {
+            Debug.LogError("CameraAnimator: animClip is not assigned!", this);
+            Destroy(gameObject);
+            return;
+        }
         Destroy(gameObject, animClip.length);
     }
 }

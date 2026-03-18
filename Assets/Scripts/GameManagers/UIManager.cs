@@ -119,12 +119,20 @@ public class UIManager : MonoBehaviour, IUIObservable<UIManager>
         
         if (gameMasterObject != null)
         {
-            AS = gameMasterObject.GetComponent<AudioSource>();
-            CollectableAS = gameMasterObject.GetComponent<AudioSource>();
-            
-            if (AS == null || CollectableAS == null)
+            AudioSource[] sources = gameMasterObject.GetComponents<AudioSource>();
+            if (sources.Length >= 2)
             {
-                Debug.LogError("AudioSource components not found on GameMaster.");
+                AS = sources[0];
+                CollectableAS = sources[1];
+            }
+            else if (sources.Length == 1)
+            {
+                AS = sources[0];
+                CollectableAS = sources[0];
+            }
+            else
+            {
+                Debug.LogError("GameMaster has no AudioSource components.");
             }
         }
         else

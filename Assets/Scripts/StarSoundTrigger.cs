@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class StarSoundTrigger : MonoBehaviour
 {
-    AudioSource AS;
     [SerializeField] GameObject StarCollectable;
-    void Start()
-    {
-        AS = gameObject.GetComponent<AudioSource>();
-    }
 
     void Update()
     {

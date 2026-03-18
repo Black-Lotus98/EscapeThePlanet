@@ -10,7 +10,13 @@ public class TeleportButton : MonoBehaviour
 
     void Start()
     {
-        teleportBtn = GameObject.FindGameObjectWithTag("TeleportBtn").gameObject;
+        GameObject found = GameObject.FindGameObjectWithTag("TeleportBtn");
+        if (found == null)
+        {
+            Debug.LogError("TeleportButton: No GameObject with tag 'TeleportBtn' found!", this);
+            return;
+        }
+        teleportBtn = found;
         teleportBtn.SetActive(false);
     }
 

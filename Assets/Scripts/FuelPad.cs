@@ -23,6 +23,12 @@ public class FuelPad : MonoBehaviour
 
     private void Awake()
     {
+        if (fuelPadData == null)
+        {
+            Debug.LogError("FuelPad: fuelPadData is not assigned!", this);
+            enabled = false;
+            return;
+        }
         ChangeState(new IdleState());
         refillAmount = fuelPadData.RefillAmount;
         refillSpeed = fuelPadData.RefillSpeed;
@@ -34,11 +40,8 @@ public class FuelPad : MonoBehaviour
     {
         if (refillAmount >= 0 && fuelManager.FuelAmount < fuelManager.MaxFlightTime)
         {
-            fuelManager.RefillFuel(refillAmount);
-            Debug.Log("RefillSpeed: " + refillAmount);
-            refillAmount -= Time.deltaTime * refillAmount;
-            Debug.Log("RefillAmount: " + refillAmount);
-
+            fuelManager.RefillFuel(refillSpeed);
+            refillAmount -= Time.deltaTime * refillSpeed;
         }
     }
     private void OnTriggerEnter(Collider other)

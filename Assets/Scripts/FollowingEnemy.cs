@@ -5,12 +5,12 @@ using UnityEngine;
 public class FollowingEnemy : MonoBehaviour
 {
     [SerializeField] Transform CurrentTarget;
-    Vector3 StartPostion;
+    Vector3 StartPosition;
     [SerializeField] float MovementSpeed= 0.01f;
      private void Start()
     {
         CurrentTarget = null;
-        StartPostion = gameObject.GetComponent<Transform>().position;
+        StartPosition = transform.position;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -36,9 +36,9 @@ public class FollowingEnemy : MonoBehaviour
         {
             transform.position = Vector3.MoveTowards(transform.position,CurrentTarget.position,MovementSpeed*Time.deltaTime);
         }
-        else if(CurrentTarget == null || (CurrentTarget.position == StartPostion))
+        else if(CurrentTarget == null || Vector3.Distance(CurrentTarget.position, StartPosition) < 0.01f)
         {
-            transform.position = Vector3.MoveTowards(transform.position,StartPostion,MovementSpeed*Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position,StartPosition,MovementSpeed*Time.deltaTime);
         }
     }
 }

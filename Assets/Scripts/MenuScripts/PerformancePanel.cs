@@ -9,6 +9,11 @@ public class PerformancePanel : MonoBehaviour
 
     private void OnEnable()
     {
+        if (loadStatus == null)
+        {
+            Debug.LogError("PerformancePanel: loadStatus is not assigned!", this);
+            return;
+        }
         loadStatus.LoadProgress();
     }
 

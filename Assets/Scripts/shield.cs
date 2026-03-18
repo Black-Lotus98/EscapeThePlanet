@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class shield : MonoBehaviour
+public class Shield : MonoBehaviour
 {
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Bullet")
+        if (other.CompareTag("Bullet"))
         {
-            other.gameObject.SetActive(false);
             Destroy(other.gameObject);
         }
     }

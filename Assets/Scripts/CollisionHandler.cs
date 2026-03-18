@@ -17,7 +17,7 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] GameObject FinishTutorialPlane;
 
     SaveDataManager saveDataManager;
-
+    InputHandler inputHandler;
 
     AudioSource AS;
 
@@ -40,9 +40,12 @@ public class CollisionHandler : MonoBehaviour
         // However, this way we dont need to used SaveDataManager.Instance every time we need it,
         // we just use the word saveDataManager
         saveDataManager = SaveDataManager.Instance;
+        inputHandler = GetComponent<InputHandler>();
 
         // Loading the data from the SaveDataManager
         GameData gameData = saveDataManager.Load();
+        if (gameData == null)
+            gameData = new GameData();
 
         // GameData gameData = SaveManager.Load();
         // Getting the current level data from the game data
@@ -125,7 +128,7 @@ public class CollisionHandler : MonoBehaviour
         AS.Stop();
         AS.PlayOneShot(Explosion);
         ExplosionParticles.Play();
-        GetComponent<InputHandler>().enabled = false;
+        if (inputHandler != null) inputHandler.enabled = false;
         numberOfDeaths++;
         if (!isTutorial)
         {
@@ -159,7 +162,7 @@ public class CollisionHandler : MonoBehaviour
         AS.Stop();
         AS.PlayOneShot(Finish);
         FinishParticles.Play();
-        GetComponent<InputHandler>().enabled = false;
+        if (inputHandler != null) inputHandler.enabled = false;
         gameManager.WinLevel();
         Invoke("LoadNextLevel", delayTime);
         saveDataManager.Save(gameData);
@@ -170,7 +173,7 @@ public class CollisionHandler : MonoBehaviour
         AS.Stop();
         AS.PlayOneShot(Finish);
         FinishParticles.Play();
-        GetComponent<InputHandler>().enabled = false;
+        if (inputHandler != null) inputHandler.enabled = false;
         FinishTutorialPlane.SetActive(true);
         Invoke("loadTutorial", delayTime);
 

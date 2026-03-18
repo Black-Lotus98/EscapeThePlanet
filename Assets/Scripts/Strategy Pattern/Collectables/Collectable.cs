@@ -20,7 +20,9 @@ public abstract class Collectable<T> : MonoBehaviour where T : UIManager
         {
             Collect(manager);
 
-            Instantiate(ExplosionEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+            ParticleSystem effect = Instantiate(ExplosionEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+            var main = effect.main;
+            Destroy(effect.gameObject, main.duration + main.startLifetime.constantMax);
             Destroy(gameObject);
         }
     }

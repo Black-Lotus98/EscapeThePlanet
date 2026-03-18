@@ -1,7 +1,5 @@
 using UnityEngine;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 // The class is static because there should not be an instance of this class
 public static class SaveManager
@@ -12,13 +10,10 @@ public static class SaveManager
     public static void Save(GameData data)
     {
         if (!DirectoryExists())
-        {
             Directory.CreateDirectory(Application.persistentDataPath + "/" + director);
-        }
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(GetFullPath());
-        bf.Serialize(file, data);
-        file.Close();
+
+        string json = JsonUtility.ToJson(data);
+        File.WriteAllText(GetFullPath(), AESCrypto.Encrypt(json));
     }
 
     public static GameData Load()
@@ -27,14 +22,11 @@ public static class SaveManager
         {
             try
             {
-                BinaryFormatter bf = new BinaryFormatter();
-                FileStream file = File.Open(GetFullPath(), FileMode.Open);
-                GameData data = (GameData)bf.Deserialize(file);
-                file.Close();
-
-                return data;
+                string encrypted = File.ReadAllText(GetFullPath());
+                string json = AESCrypto.Decrypt(encrypted);
+                return JsonUtility.FromJson<GameData>(json);
             }
-            catch (SerializationException)
+            catch
             {
                 Debug.LogError("Failed to load save data");
                 return null;
@@ -46,18 +38,11 @@ public static class SaveManager
     public static void ResetGameData(GameData data)
     {
         if (!DirectoryExists())
-        {
             Directory.CreateDirectory(Application.persistentDataPath + "/" + director);
-        }
-        BinaryFormatter formatter = new BinaryFormatter();
-        string path = Application.persistentDataPath + "/Player.data";
-
-        // FileStream stream = new FileStream(GetFullPath(), FileMode.Create);
-        FileStream file = File.Create(GetFullPath());
 
         data = new GameData();
-        formatter.Serialize(file, data);
-        file.Close();
+        string json = JsonUtility.ToJson(data);
+        File.WriteAllText(GetFullPath(), AESCrypto.Encrypt(json));
     }
 
     private static bool SaveExists()
@@ -74,6 +59,4 @@ public static class SaveManager
     {
         return Application.persistentDataPath + "/" + director + "/" + fileName;
     }
-
-
 }

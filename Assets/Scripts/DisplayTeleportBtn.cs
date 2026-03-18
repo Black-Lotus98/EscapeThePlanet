@@ -18,7 +18,7 @@ public class DisplayTeleportBtn : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player" && teleportPad.enabled)
+        if (other.CompareTag("Player") && teleportPad.enabled)
         {
             teleportBtn.TPBtn.SetActive(true);
         }
@@ -26,7 +26,7 @@ public class DisplayTeleportBtn : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Player" && teleportPad.enabled)
+        if (other.CompareTag("Player") && teleportPad.enabled)
         {
             teleportBtn.TPBtn.SetActive(false);
         }
@@ -34,7 +34,13 @@ public class DisplayTeleportBtn : MonoBehaviour
 
     void GetComponents()
     {
-        teleportBtn = GameObject.FindGameObjectWithTag("TPBtn").GetComponent<TeleportButton>();
+        GameObject tpBtnGO = GameObject.FindGameObjectWithTag("TPBtn");
+        if (tpBtnGO == null)
+        {
+            Debug.LogError("DisplayTeleportBtn: No GameObject with tag 'TPBtn' found!", this);
+            return;
+        }
+        teleportBtn = tpBtnGO.GetComponent<TeleportButton>();
         teleportPad = GetComponent<CustomTeleporter>();
         teleportBtn.TPBtn.SetActive(false);
     }

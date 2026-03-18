@@ -11,7 +11,13 @@ public class TutorialManager : MonoBehaviour
     private void Start()
     {
         TutorialPlane.SetActive(true);
-        GameObject.FindGameObjectWithTag("Player").GetComponent<InputHandler>().enabled = false;
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogError("TutorialManager: Player not found in scene!", this);
+            return;
+        }
+        player.GetComponent<InputHandler>().enabled = false;
     }
 }
 

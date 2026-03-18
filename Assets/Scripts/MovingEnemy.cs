@@ -6,7 +6,7 @@ public class MovingEnemy : MonoBehaviour
 {
     Transform CurrentTarget;
     [SerializeField] List<Transform> Targets;
-    [SerializeField]int CurrentTargetIndext;
+    [SerializeField]int CurrentTargetIndex;
    
     [SerializeField] float MovementSpeed= 0.01f;
     [SerializeField] float EnemyRadius = 2f;
@@ -14,8 +14,14 @@ public class MovingEnemy : MonoBehaviour
 
     void Start()
     {
-        CurrentTargetIndext =0;
-        CurrentTarget = Targets[CurrentTargetIndext];
+        if (Targets == null || Targets.Count == 0)
+        {
+            Debug.LogError("MovingEnemy has no targets assigned!", this);
+            enabled = false;
+            return;
+        }
+        CurrentTargetIndex = 0;
+        CurrentTarget = Targets[CurrentTargetIndex];
     }
 
 
@@ -23,13 +29,13 @@ public class MovingEnemy : MonoBehaviour
     {
         if(Vector3.Distance(transform.position, CurrentTarget.position) < EnemyRadius)
         {
-            CurrentTargetIndext++;
-            if(CurrentTargetIndext >= Targets.Count)
+            CurrentTargetIndex++;
+            if(CurrentTargetIndex >= Targets.Count)
             {
-                CurrentTargetIndext = 0;
+                CurrentTargetIndex = 0;
             }
             
-            CurrentTarget = Targets[CurrentTargetIndext];
+            CurrentTarget = Targets[CurrentTargetIndex];
         }
         transform.position = Vector3.MoveTowards(transform.position, CurrentTarget.position, MovementSpeed * Time.deltaTime) ;
 

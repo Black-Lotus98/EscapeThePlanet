@@ -64,6 +64,7 @@ public class Player : MonoBehaviour, IObservable
     [Header("Game Managers")]
     [SerializeField] ShieldManager shieldManager;
     SaveDataManager saveDataManager;
+    InputHandler inputHandler;
 
     public ShieldManager GetShieldManager()
     {
@@ -129,6 +130,7 @@ public class Player : MonoBehaviour, IObservable
         // saveDataManager = GameObject.Find("SaveDataManager").GetComponent<SaveDataManager>();
 
         saveDataManager = SaveDataManager.Instance;
+        inputHandler = GetComponent<InputHandler>();
         NotifyObservers(UIState.ShieldChanged);
         NotifyObservers(UIState.FuelChanged);
 
@@ -145,7 +147,7 @@ public class Player : MonoBehaviour, IObservable
 
     void Update()
     {
-        if (gameObject.GetComponent<InputHandler>().enabled)
+        if (inputHandler != null && inputHandler.enabled)
         {
             ActivateShield();
             shieldUsage();
@@ -306,9 +308,9 @@ public class Player : MonoBehaviour, IObservable
 
     public int GetStarCount()
     {
-        GameData gameData = SaveManager.Load();
+        GameData gameData = saveDataManager.Load();
+        if (gameData == null) return 0;
         var currentLevelData = GetLevelData(gameData);
-
         return currentLevelData.collectedStars;
     }
 

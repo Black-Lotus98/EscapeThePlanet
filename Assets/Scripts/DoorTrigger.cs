@@ -14,6 +14,7 @@ public class DoorTrigger : MonoBehaviour
     [SerializeField] float OpeningPosition;
     [SerializeField] float ClosingPosition;
     [SerializeField] bool DoorIsOpen;
+    bool isOpenInvoked = false;
     // [SerializeField] string DoorName = "DoorName";
 
     [Header("Locked Door Settings")]
@@ -53,13 +54,21 @@ public class DoorTrigger : MonoBehaviour
                 else
                 {
                     tipText.text = "Wait for the door to Open";
-                    Invoke("OpenDoor", 2f);
+                    if (!isOpenInvoked)
+                    {
+                        isOpenInvoked = true;
+                        Invoke("OpenDoor", 2f);
+                    }
                 }
             }
             else
             {
                 tipText.text = "Wait for the door to Open";
-                Invoke("OpenDoor", 2f);
+                if (!isOpenInvoked)
+                {
+                    isOpenInvoked = true;
+                    Invoke("OpenDoor", 2f);
+                }
                 // DoorController();
             }
         }
@@ -67,20 +76,19 @@ public class DoorTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        var KeyManager = other.gameObject.GetComponent<KeyManager>();
-        if (other.gameObject.tag == "Player")
+        if (other.CompareTag("Player"))
         {
-            playerHasKey = KeyManager.PlayerHasKey;
+            var keyManager = other.gameObject.GetComponent<KeyManager>();
+            if (keyManager != null)
+                playerHasKey = keyManager.PlayerHasKey;
             textGO.SetActive(true);
             isPlayerInside = true;
         }
-
-
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.CompareTag("Player"))
         {
 
             if (DoorIsOpen)
@@ -89,6 +97,8 @@ public class DoorTrigger : MonoBehaviour
                 AS.Stop();
                 AS.PlayOneShot(DoorOpeningSFX);
             }
+            CancelInvoke("OpenDoor");
+            isOpenInvoked = false;
             textGO.SetActive(false);
             isPlayerInside = false;
         }
@@ -99,6 +109,7 @@ public class DoorTrigger : MonoBehaviour
     {
         Door.transform.DOLocalMoveY(OpeningPosition, DoorOpeningSFX.length);
         DoorIsOpen = true;
+        isOpenInvoked = false;
     }
 
     void CloseDoor()

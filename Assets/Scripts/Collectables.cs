@@ -9,8 +9,6 @@ public class Collectables : MonoBehaviour
     [SerializeField] ParticleSystem ExplosionEffect;
     [SerializeField] int amount;
 
-    int keyCounter = 0;
-
     private void OnTriggerEnter(Collider other)
     {
         var player = other.GetComponent<Player>();
@@ -34,7 +32,6 @@ public class Collectables : MonoBehaviour
 
             if (gameObject.tag == "Key")
             {
-                keyCounter++;
                 Instantiate(ExplosionEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
                 player.SetKeyStatus(true);
                 Destroy(gameObject);
