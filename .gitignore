@@ -98,5 +98,35 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
+# Rider / JetBrains
+.idea/
+*.sln.iml
 
-.vscode/
+# Unity (additional common caches)
+/[Ll]ocal[Cc]ache/
+/[Pp]ackage[Cc]ache/
+/[Ll]ibrary/Bee/
+/[Ll]ibrary/Il2cppBuildCache/
+
+# Visual Studio / tooling extras
+*.VC.VC.opendb
+
+# Native / player build artifacts (sometimes produced outside Build/Builds)
+*.exe
+*.x86
+*.x86_64
+*.x64
+*.so
+*.dll
+*.dylib
+
+# OS junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VS Code (project workspace)
+/.vscode/
+
+/.cursor/
