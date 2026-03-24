@@ -54,7 +54,7 @@ public class StarsUIObserver : MonoBehaviour, IUIObserver<StarsManager>
         starsManager.AddObserver(this);
         isRegistered = true;
         
-        Debug.Log("StarsUIObserver registered successfully!");
+        // Debug.Log("StarsUIObserver registered successfully!");
     }
 
     public void OnStateChange(StarsManager starsManager, UIState state)

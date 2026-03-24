@@ -55,5 +55,6 @@
     "cSpell.words": [
         "Behaviour"
     ],
-    "dotnet.defaultSolution": "EscapeThePlanet.slnx"
+    "dotnet.defaultSolution": "EscapeThePlanet.slnx",
+    "dotnet.preferCSharpExtension": true
 }

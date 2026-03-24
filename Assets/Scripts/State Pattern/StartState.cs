@@ -6,6 +6,6 @@ public class StartState : MonoBehaviour, CollisionState
 {
     public void Handle(CollisionHandler context)
     {
-        Debug.Log("You hit the launch pad, StartState ");
+        // Debug.Log("You hit the launch pad, StartState ");
     }
 }

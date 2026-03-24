@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
             }
         }
         
-        Debug.Log($"Cached {starsList.Count} star objects.");
+        // Debug.Log($"Cached {starsList.Count} star objects.");
     }
 
     private void LoadLevelData()

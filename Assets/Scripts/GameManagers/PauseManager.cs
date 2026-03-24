@@ -58,7 +58,7 @@ public class PauseManager : MonoBehaviour
             Debug.LogError("HowToPlayPanel not found in Canvas!");
         }
 
-        Debug.Log("UI references auto-assigned successfully!");
+        // Debug.Log("UI references auto-assigned successfully!");
     }
 
     public void ExitToMainMenu()

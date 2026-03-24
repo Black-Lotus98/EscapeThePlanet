@@ -49,7 +49,7 @@ public class FuelUIObserver : MonoBehaviour, IUIObserver<FuelManager>
         fuelManager.NotifyObservers(UIState.FuelChanged);
         isRegistered = true;
         
-        Debug.Log("FuelUIObserver registered successfully!");
+        // Debug.Log("FuelUIObserver registered successfully!");
     }
 
     public void OnStateChange(FuelManager fuelManager, UIState state)

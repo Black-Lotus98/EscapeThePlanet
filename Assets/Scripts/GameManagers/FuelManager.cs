@@ -52,7 +52,6 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>
 
     public new void NotifyObservers(UIState state)
     {
-        Debug.Log($"FuelManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
             if (observer != null)
