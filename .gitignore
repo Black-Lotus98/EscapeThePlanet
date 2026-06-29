@@ -130,3 +130,19 @@ Desktop.ini
 /.vscode/
 
 /.cursor/
+
+# --- Project-specific ---
+# Local secrets / credentials
+.password/
+
+# Profiler captures (can be large)
+/[Pp]rofiler[Cc]aptures/
+
+# Editor / automation generated screenshots
+/[Aa]ssets/[Ss]creenshots/
+/[Aa]ssets/[Ss]creenshots.meta
+
+# Claude MCP-for-Unity bridge (local dev tooling; restored from the git URL in
+# Packages/manifest.json on a new device, so it doesn't need committing).
+/[Pp]ackages/com.coplaydev.unity-mcp/
+/[Pp]ackages/com.coplaydev.unity-mcp.meta
