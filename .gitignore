@@ -146,3 +146,9 @@ Desktop.ini
 # Packages/manifest.json on a new device, so it doesn't need committing).
 /[Pp]ackages/com.coplaydev.unity-mcp/
 /[Pp]ackages/com.coplaydev.unity-mcp.meta
+
+# Build/test-generated junk that regenerates on every build
+/[Aa]ssets/XR/[Tt]emp/
+/[Aa]ssets/XR/[Tt]emp.meta
+/[Aa]ssets/XR/[Uu]ser[Ss]imulation[Ss]ettings/
+/[Aa]ssets/[Rr]esources/PerformanceTestRun*
