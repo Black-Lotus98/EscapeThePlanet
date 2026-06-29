@@ -94,7 +94,6 @@ public class StarsManager : UIManager, IUIObservable<StarsManager>
 
     public new void NotifyObservers(UIState state)
     {
-        Debug.Log($"StarsManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
             if (observer != null)

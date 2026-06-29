@@ -3,13 +3,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 using UnityEngine.UI;
 
 public class ShieldUIObserver : MonoBehaviour, IUIObserver<ShieldManager>
 {
     [Header("UI References")]
+    [FormerlySerializedAs("ShieldSlider")]
     [SerializeField] private Slider shieldSlider;
+    [FormerlySerializedAs("ShieldText")]
     [SerializeField] private TextMeshProUGUI shieldText;
     
     private ShieldManager shieldManager;

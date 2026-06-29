@@ -41,7 +41,7 @@ public static class SaveData
         }
         else
         {
-            Debug.LogError("Save file not found in " + path);
+            // No save file yet (e.g. first run) — normal, callers handle null.
             return null;
         }
     }

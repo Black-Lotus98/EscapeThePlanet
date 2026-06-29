@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityStandardAssets.CrossPlatformInput;
 
 public class ShieldManager : UIManager, IUIObservable<ShieldManager>
 {
@@ -130,7 +129,6 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>
 
     public new void NotifyObservers(UIState state)
     {
-        Debug.Log($"ShieldManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
             if (observer != null)

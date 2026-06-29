@@ -50,7 +50,6 @@ public class KeyManager : UIManager, IUIObservable<KeyManager>
 
     public new void NotifyObservers(UIState state)
     {
-        Debug.Log($"KeyManager: Notifying {observers.Count} observers of {state}");
         foreach (var observer in observers)
         {
             if (observer != null)

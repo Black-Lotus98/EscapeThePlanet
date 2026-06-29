@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
         
         if (starObjects.Length == 0)
         {
-            Debug.LogWarning("No star collectables found in scene.");
+            // A level may legitimately have no star collectables.
             return;
         }
         
@@ -76,18 +76,9 @@ public class GameManager : MonoBehaviour
     {
         try
         {
-            var currentLevelIndex = PlayerPrefs.GetInt("levelReached", 1);
-            var gameData = saveManager.Load();
-            
-            if (gameData?.levelData != null)
-            {
-                var levelData = gameData.levelData.FirstOrDefault(x => x.currentLevelIndex == currentLevelIndex);
-                
-                if (levelData == null)
-                {
-                    Debug.LogWarning($"Level data not found for level {currentLevelIndex}");
-                }
-            }
+            // Level data is created on demand when a level is first played/saved,
+            // so a missing entry here is normal (e.g. first run) and not an error.
+            saveManager.Load();
         }
         catch (System.Exception e)
         {

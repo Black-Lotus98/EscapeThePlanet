@@ -207,7 +207,11 @@ public class CollisionHandler : MonoBehaviour
     public void LoadData()
     {
         PlayerData data = SaveData.LoadPlayer();
-        numberOfDeaths = data.NumberOfDeaths;
+        // No save file yet (first run) returns null — keep the current count.
+        if (data != null)
+        {
+            numberOfDeaths = data.NumberOfDeaths;
+        }
     }
 
 
