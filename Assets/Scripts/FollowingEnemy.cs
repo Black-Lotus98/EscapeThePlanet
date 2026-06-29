@@ -1,171 +1,327 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
+using UnityEngine.Serialization;
 
+// Smart patrol/chase enemy for the 2.5D (XY-plane) game.
+//
+// Behaviour:
+//   Patrol      - moves between waypoints, pausing briefly at each.
+//   Chase       - when the player enters the vision cone (range + angle + line of sight),
+//                 the enemy chases the player.
+//   ReturnDelay - when the player leaves sight, the enemy stops and waits
+//                 'returnToPatrolDelay' seconds, then resumes patrol
+//                 (re-acquiring the player immediately if it reappears).
+//
+// All movement happens on the XY plane (z is locked to the spawn position),
+// so it works in any level without a baked NavMesh.
 public class FollowingEnemy : MonoBehaviour
 {
-    enum State { Patrol, Chase }
+    enum State { Patrol, Chase, ReturnDelay }
 
     [Header("Patrol")]
-    [SerializeField] List<Transform> waypoints;
+    [Tooltip("Points the enemy patrols between. Leave empty for a stationary sentry.")]
+    [SerializeField] List<Transform> waypoints = new List<Transform>();
+    [Tooltip("How close (in world units) counts as 'reached' a waypoint.")]
     [SerializeField] float waypointRadius = 0.5f;
-    [SerializeField] float scanDuration = 2f;
-    [SerializeField] float scanSpeed = 60f;
+    [Tooltip("Seconds to pause at each waypoint before moving to the next.")]
+    [SerializeField] float waypointPause = 1f;
+    [Tooltip("Bounce back and forth along the waypoints instead of looping.")]
+    [SerializeField] bool pingPong = false;
 
-    [Header("Detection")]
-    [SerializeField] float detectionRange = 10f;
-    [SerializeField] float fovAngle = 90f;
-    [SerializeField] LayerMask obstacleMask;
+    [Header("Vision")]
+    [Tooltip("How far the enemy can see.")]
+    [FormerlySerializedAs("detectionRange")]
+    [SerializeField] float visionRange = 10f;
+    [Tooltip("Full width of the vision cone, in degrees.")]
+    [FormerlySerializedAs("fovAngle")]
+    [SerializeField] float visionAngle = 90f;
+    [Tooltip("Layers whose SOLID colliders block line of sight (walls). Trigger colliders (e.g. pickups) never block. Set to Nothing to let the enemy see through walls.")]
+    [SerializeField] LayerMask obstacleMask = ~0; // Everything by default
 
     [Header("Movement")]
     [SerializeField] float patrolSpeed = 2f;
     [SerializeField] float chaseSpeed = 5f;
+    [Tooltip("How fast the vision direction turns toward its target, in degrees/second.")]
+    [SerializeField] float turnSpeed = 360f;
+
+    [Header("Behaviour")]
+    [Tooltip("Seconds the enemy waits (stopped) after losing sight before returning to patrol.")]
+    [SerializeField] float returnToPatrolDelay = 3f;
+    [Tooltip("If the player gets this close, it is caught (triggers the crash sequence).")]
     [SerializeField] float attackRange = 1.5f;
 
-    [Header("Vision Light")]
+    [Header("Feedback (optional)")]
     [SerializeField] Light visionLight;
-    [SerializeField] Color patrolColor = new Color(1f, 0.5f, 0f); // orange
+    [SerializeField] Color patrolColor = new Color(0.2f, 0.9f, 1f); // cyan (stands out from the level's orange blocks)
     [SerializeField] Color chaseColor = Color.red;
-
-    [Header("Audio")]
     [SerializeField] AudioClip detectionSound;
 
     State state = State.Patrol;
-    NavMeshAgent agent;
     AudioSource audioSource;
     Transform player;
     CollisionHandler playerCollisionHandler;
 
+    Vector3 facingDir = Vector3.right; // logical vision direction, in the XY plane
     int waypointIndex = 0;
-    float scanTimer = 0f;
-    float scanDirection = 1f;
-    bool isScanning = false;
-    bool hasKilled = false;
+    int waypointStep = 1;              // direction of travel for ping-pong
+    float waypointWaitTimer = 0f;
+    float lostSightTimer = 0f;
+    float planeZ;                      // z is locked to the spawn position
+    float lightForwardOffset;          // distance from center to the enemy's front (for the vision light)
+    Vector3 homePosition;              // guard post (used by stationary, waypoint-less sentries)
+    Vector3 homeFacing = Vector3.right;
+    bool hasCaughtPlayer = false;
 
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
         audioSource = GetComponent<AudioSource>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        playerCollisionHandler = player.GetComponent<CollisionHandler>();
+        planeZ = transform.position.z;
 
-        agent.speed = patrolSpeed;
+        // Place the vision light just in front of the (possibly large) body so the cone is visible.
+        var rend = GetComponent<Renderer>();
+        lightForwardOffset = rend != null ? rend.bounds.extents.x : 0f;
 
-        if (visionLight != null)
+        var playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO != null)
         {
-            visionLight.type = LightType.Spot;
-            visionLight.spotAngle = fovAngle;
-            visionLight.range = detectionRange;
-            visionLight.color = patrolColor;
+            player = playerGO.transform;
+            playerCollisionHandler = playerGO.GetComponent<CollisionHandler>();
+        }
+        else
+        {
+            Debug.LogWarning("FollowingEnemy: no GameObject tagged 'Player' found.", this);
         }
 
-        if (waypoints != null && waypoints.Count > 0)
-            agent.SetDestination(waypoints[0].position);
+        if (waypoints != null && waypoints.Count > 0 && waypoints[0] != null)
+            facingDir = DirInPlane(waypoints[0].position - transform.position, facingDir);
+        else
+            facingDir = DirInPlane(transform.right, facingDir); // stationary sentry guards along its local +X (rotate the enemy to aim it)
+
+        // Remember the guard post so a stationary sentry can return to it after a chase.
+        homePosition = transform.position;
+        homeFacing = facingDir;
+
+        ApplyVisionLight(patrolColor);
     }
 
     void Update()
     {
-        if (state == State.Patrol) UpdatePatrol();
-        else UpdateChase();
+        if (player == null) return;
+
+        switch (state)
+        {
+            case State.Patrol: UpdatePatrol(); break;
+            case State.Chase: UpdateChase(); break;
+            case State.ReturnDelay: UpdateReturnDelay(); break;
+        }
+
+        TryCatchPlayer();
     }
+
+    // ---------------------------------------------------------------- States
 
     void UpdatePatrol()
     {
-        if (CanSeePlayer())
+        if (CanSeePlayer()) { EnterChase(); return; }
+
+        if (!HasWaypoints()) { ReturnToPost(); return; } // stationary sentry
+
+        Vector3 target = waypoints[waypointIndex].position;
+
+        if (DistanceInPlane(target) <= waypointRadius)
         {
-            isScanning = false;
-            agent.isStopped = false;
-            agent.speed = chaseSpeed;
-            state = State.Chase;
-            if (visionLight != null) visionLight.color = chaseColor;
-            if (detectionSound != null && audioSource != null && !audioSource.isPlaying) audioSource.PlayOneShot(detectionSound);
+            waypointWaitTimer += Time.deltaTime;
+            if (waypointWaitTimer >= waypointPause)
+            {
+                waypointWaitTimer = 0f;
+                AdvanceWaypoint();
+            }
             return;
         }
 
-        if (waypoints == null || waypoints.Count == 0)
-        {
-            Scan();
-            return;
-        }
-
-        bool reachedWaypoint = !agent.pathPending && agent.remainingDistance <= waypointRadius;
-
-        if (reachedWaypoint && !isScanning)
-        {
-            isScanning = true;
-            scanTimer = 0f;
-            agent.isStopped = true;
-        }
-
-        if (isScanning) Scan();
+        MoveTowards(target, patrolSpeed);
     }
 
-    void Scan()
+    void EnterChase()
     {
-        scanTimer += Time.deltaTime;
-        transform.Rotate(Vector3.up, scanSpeed * scanDirection * Time.deltaTime);
-
-        if (scanTimer >= scanDuration * 0.5f)
-            scanDirection = -1f;
-
-        if (scanTimer >= scanDuration)
-        {
-            isScanning = false;
-            scanDirection = 1f;
-
-            if (waypoints != null && waypoints.Count > 0)
-            {
-                agent.isStopped = false;
-                waypointIndex = (waypointIndex + 1) % waypoints.Count;
-                agent.SetDestination(waypoints[waypointIndex].position);
-            }
-        }
+        state = State.Chase;
+        ApplyVisionLight(chaseColor);
+        if (detectionSound != null && audioSource != null && !audioSource.isPlaying)
+            audioSource.PlayOneShot(detectionSound);
     }
 
     void UpdateChase()
     {
         if (!CanSeePlayer())
         {
-            state = State.Patrol;
-            agent.speed = patrolSpeed;
-            if (visionLight != null) visionLight.color = patrolColor;
-            if (waypoints != null && waypoints.Count > 0)
-                agent.SetDestination(waypoints[waypointIndex].position);
+            state = State.ReturnDelay;
+            lostSightTimer = 0f;
             return;
         }
 
-        agent.SetDestination(player.position);
+        MoveTowards(player.position, chaseSpeed);
+    }
 
-        Vector3 dir = player.position - transform.position;
-        dir.y = 0;
-        if (dir != Vector3.zero)
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 5f * Time.deltaTime);
+    void UpdateReturnDelay()
+    {
+        // Player reappeared -> resume the chase immediately.
+        if (CanSeePlayer()) { EnterChase(); return; }
 
-        if (!hasKilled && Vector3.Distance(transform.position, player.position) <= attackRange)
+        // Otherwise hold position and count down before returning to patrol.
+        lostSightTimer += Time.deltaTime;
+        if (lostSightTimer >= returnToPatrolDelay)
         {
-            hasKilled = true;
-            playerCollisionHandler.StartCrashSequence();
+            state = State.Patrol;
+            waypointWaitTimer = 0f;
+            ApplyVisionLight(patrolColor);
         }
     }
 
+    // Stationary sentry: walk back to the guard post, then hold and face the original direction.
+    void ReturnToPost()
+    {
+        if (DistanceInPlane(homePosition) > waypointRadius)
+        {
+            MoveTowards(homePosition, patrolSpeed);
+        }
+        else
+        {
+            transform.position = new Vector3(homePosition.x, homePosition.y, planeZ);
+            facingDir = Vector3.RotateTowards(facingDir, homeFacing, Mathf.Deg2Rad * turnSpeed * Time.deltaTime, 0f);
+            AimVisionLight();
+        }
+    }
+
+    // ------------------------------------------------------------- Movement
+
+    void MoveTowards(Vector3 worldTarget, float speed)
+    {
+        Vector3 target = new Vector3(worldTarget.x, worldTarget.y, planeZ);
+
+        Vector3 desired = DirInPlane(target - transform.position, facingDir);
+        facingDir = Vector3.RotateTowards(facingDir, desired, Mathf.Deg2Rad * turnSpeed * Time.deltaTime, 0f);
+
+        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+        AimVisionLight();
+    }
+
+    void AdvanceWaypoint()
+    {
+        if (pingPong)
+        {
+            int next = waypointIndex + waypointStep;
+            if (next < 0 || next >= waypoints.Count)
+            {
+                waypointStep = -waypointStep;
+                next = waypointIndex + waypointStep;
+            }
+            waypointIndex = Mathf.Clamp(next, 0, waypoints.Count - 1);
+        }
+        else
+        {
+            waypointIndex = (waypointIndex + 1) % waypoints.Count;
+        }
+    }
+
+    // --------------------------------------------------------------- Vision
+
     bool CanSeePlayer()
     {
-        Vector3 dirToPlayer = player.position - transform.position;
-        float dist = dirToPlayer.magnitude;
+        Vector3 toPlayer = DirInPlane(player.position - transform.position, facingDir);
+        float dist = DistanceInPlane(player.position);
 
-        if (dist > detectionRange) return false;
-        if (Vector3.Angle(transform.forward, dirToPlayer) > fovAngle * 0.5f) return false;
-        if (Physics.Raycast(transform.position, dirToPlayer.normalized, dist, obstacleMask)) return false;
+        if (dist > visionRange) return false;
+        if (Vector3.Angle(facingDir, toPlayer) > visionAngle * 0.5f) return false;
+        if (!HasLineOfSight()) return false;
 
         return true;
     }
 
+    // True if no solid wall sits between the enemy and the player.
+    // Ignores the enemy's own colliders, the player, and trigger colliders (pickups).
+    bool HasLineOfSight()
+    {
+        if (obstacleMask.value == 0) return true; // configured to see through walls
+
+        Vector3 origin = transform.position;
+        Vector3 toPlayer = player.position - origin;
+        float dist = toPlayer.magnitude;
+        if (dist < 0.001f) return true;
+
+        var hits = Physics.RaycastAll(origin, toPlayer.normalized, dist, obstacleMask, QueryTriggerInteraction.Ignore);
+        foreach (var h in hits)
+        {
+            Transform ht = h.collider.transform;
+            if (ht == transform || ht.IsChildOf(transform)) continue; // ignore self
+            if (ht == player || ht.IsChildOf(player)) continue;       // the player isn't a wall
+            return false;                                             // a solid wall blocks the view
+        }
+        return true;
+    }
+
+    void TryCatchPlayer()
+    {
+        if (hasCaughtPlayer || playerCollisionHandler == null) return;
+        if (DistanceInPlane(player.position) <= attackRange)
+        {
+            hasCaughtPlayer = true;
+            playerCollisionHandler.StartCrashSequence();
+        }
+    }
+
+    // ---------------------------------------------------------------- Helpers
+
+    bool HasWaypoints()
+    {
+        return waypoints != null && waypoints.Count > 0 && waypoints[waypointIndex] != null;
+    }
+
+    // Distance between this enemy and a world point, ignoring the z (depth) axis.
+    float DistanceInPlane(Vector3 world)
+    {
+        Vector2 a = new Vector2(transform.position.x, transform.position.y);
+        Vector2 b = new Vector2(world.x, world.y);
+        return Vector2.Distance(a, b);
+    }
+
+    // Flatten a vector onto the XY plane and normalise it (keeps 'fallback' if zero-length).
+    Vector3 DirInPlane(Vector3 v, Vector3 fallback)
+    {
+        v.z = 0f;
+        return v.sqrMagnitude > 0.0001f ? v.normalized : fallback;
+    }
+
+    void ApplyVisionLight(Color color)
+    {
+        if (visionLight == null) return;
+        visionLight.type = LightType.Spot;
+        visionLight.spotAngle = visionAngle;
+        // Reach past the (possibly large) body so the cone lands on walls beyond it.
+        visionLight.range = visionRange + lightForwardOffset;
+        visionLight.color = color;
+        AimVisionLight();
+    }
+
+    void AimVisionLight()
+    {
+        if (visionLight == null) return;
+        // Keep the light at the body centre and just point it along the facing direction;
+        // its extended range (set in ApplyVisionLight) projects the cone past the body.
+        visionLight.transform.position = transform.position;
+        visionLight.transform.rotation = Quaternion.LookRotation(facingDir, Vector3.forward);
+    }
+
     void OnDrawGizmosSelected()
     {
+        // In play mode show the real facing; in the editor approximate it with +X.
+        Vector3 f = (Application.isPlaying && facingDir.sqrMagnitude > 0.0001f) ? facingDir : Vector3.right;
+
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, Quaternion.Euler(0, -fovAngle * 0.5f, 0) * transform.forward * detectionRange);
-        Gizmos.DrawRay(transform.position, Quaternion.Euler(0, fovAngle * 0.5f, 0) * transform.forward * detectionRange);
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
+        Vector3 left = Quaternion.Euler(0f, 0f, visionAngle * 0.5f) * f;
+        Vector3 right = Quaternion.Euler(0f, 0f, -visionAngle * 0.5f) * f;
+        Gizmos.DrawRay(transform.position, left * visionRange);
+        Gizmos.DrawRay(transform.position, right * visionRange);
+        Gizmos.DrawWireSphere(transform.position, visionRange);
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
