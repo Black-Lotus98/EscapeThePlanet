@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class PauseManager : MonoBehaviour
@@ -15,6 +15,24 @@ public class PauseManager : MonoBehaviour
     
     private bool toggle = true;
     private Canvas gameCanvas;
+
+    // New Input System (generated wrapper)
+    private PlayerMovement controls;
+
+    private void Awake()
+    {
+        controls = new PlayerMovement();
+    }
+
+    private void OnEnable()
+    {
+        controls?.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controls?.Gameplay.Disable();
+    }
 
     public bool IsPaused
     {
@@ -73,7 +91,7 @@ public class PauseManager : MonoBehaviour
     
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) || CrossPlatformInputManager.GetButtonDown("Pause"))
+        if (controls.Gameplay.Pause.WasPressedThisFrame())
         {
             TogglePause();
         }

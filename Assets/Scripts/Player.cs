@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -66,6 +66,9 @@ public class Player : MonoBehaviour, IObservable
     SaveDataManager saveDataManager;
     InputHandler inputHandler;
 
+    // New Input System (generated wrapper)
+    PlayerMovement controls;
+
     public ShieldManager GetShieldManager()
     {
         return shieldManager;
@@ -123,6 +126,21 @@ public class Player : MonoBehaviour, IObservable
 
 
 
+    void Awake()
+    {
+        controls = new PlayerMovement();
+    }
+
+    void OnEnable()
+    {
+        controls?.Gameplay.Enable();
+    }
+
+    void OnDisable()
+    {
+        controls?.Gameplay.Disable();
+    }
+
     void Start()
     {
         // This will look for the save data manager in the scene, but since we are using the singleton pattern,
@@ -163,7 +181,7 @@ public class Player : MonoBehaviour, IObservable
     {
         if (ShieldCanBeUsed)
         {
-            if (Input.GetKeyDown(KeyCode.E) || CrossPlatformInputManager.GetButtonDown("Shield"))
+            if (controls.Gameplay.Shield.WasPressedThisFrame())
             {
 
                 if (!Shield.activeInHierarchy)

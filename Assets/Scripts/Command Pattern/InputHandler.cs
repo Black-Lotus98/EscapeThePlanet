@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityStandardAssets.CrossPlatformInput;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InputHandler : MonoBehaviour
 {
@@ -36,10 +36,16 @@ public class InputHandler : MonoBehaviour
     private Command stopRotationCommand;
     private Command toggleShieldCommand;
 
+    // New Input System (generated wrapper)
+    private PlayerMovement controls;
+    private bool wasThrusting;
+    private bool wasRotating;
+
     private void Awake()
     {
         // Cache components once
         invoker = new Invoker();
+        controls = new PlayerMovement();
         fuelManager = FindObjectOfType<FuelManager>();
         shieldManager = FindObjectOfType<ShieldManager>();
         gameManager = FindObjectOfType<GameManager>();
@@ -67,6 +73,16 @@ public class InputHandler : MonoBehaviour
         toggleShieldCommand = new ToggleShield(shieldManager, shieldActivationSound);
     }
 
+    private void OnEnable()
+    {
+        controls?.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controls?.Gameplay.Disable();
+    }
+
     private void Update()
     {
         // Early return if tutorial is active or level is over
@@ -84,45 +100,45 @@ public class InputHandler : MonoBehaviour
 
     private void HandleThrustInput()
     {
-        bool isThrusting = Input.GetKey(KeyCode.Space) || CrossPlatformInputManager.GetButton("Thrust");
-        bool thrustReleased = Input.GetKeyUp(KeyCode.Space) || CrossPlatformInputManager.GetButtonUp("Thrust");
-        
+        bool isThrusting = controls.Gameplay.Thrust.IsPressed();
+
         if (isThrusting)
         {
             invoker.ExecuteCommand(moveUpCommand, movementController.Rigidbdy, movementController.AS);
         }
-        else if (thrustReleased)
+        else if (wasThrusting)
         {
             invoker.ExecuteCommand(stopThrustCommand, movementController.Rigidbdy, movementController.AS);
         }
+
+        wasThrusting = isThrusting;
     }
 
     private void HandleRotationInput()
     {
-        bool isRotatingLeft = Input.GetKey(KeyCode.A) || CrossPlatformInputManager.GetButton("Left");
-        bool isRotatingRight = Input.GetKey(KeyCode.D) || CrossPlatformInputManager.GetButton("Right");
-        bool rotationReleased = Input.GetKeyUp(KeyCode.D) || CrossPlatformInputManager.GetButtonUp("Right") || 
-                               Input.GetKeyUp(KeyCode.A) || CrossPlatformInputManager.GetButtonUp("Left");
-        
-        if (isRotatingLeft)
+        // Rotate axis: negative = left (A / LeftArrow), positive = right (D / RightArrow)
+        float rotate = controls.Gameplay.Rotate.ReadValue<float>();
+
+        if (rotate < 0f)
         {
             invoker.ExecuteCommand(rotateLeftCommand, movementController.Rigidbdy, movementController.AS);
+            wasRotating = true;
         }
-        else if (isRotatingRight)
+        else if (rotate > 0f)
         {
             invoker.ExecuteCommand(rotateRightCommand, movementController.Rigidbdy, movementController.AS);
+            wasRotating = true;
         }
-        else if (rotationReleased)
+        else if (wasRotating)
         {
             invoker.ExecuteCommand(stopRotationCommand, movementController.Rigidbdy, movementController.AS);
+            wasRotating = false;
         }
     }
 
     private void HandleShieldInput()
     {
-        bool shieldPressed = Input.GetKeyDown(KeyCode.E) || CrossPlatformInputManager.GetButtonDown("Shield");
-        
-        if (shieldPressed)
+        if (controls.Gameplay.Shield.WasPressedThisFrame())
         {
             invoker.ExecuteCommand(toggleShieldCommand, movementController.Rigidbdy, movementController.AS);
         }
