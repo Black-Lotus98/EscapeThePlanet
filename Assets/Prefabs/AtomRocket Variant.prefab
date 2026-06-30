@@ -825,6 +825,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2046309907}
+    - targetCorrespondingSourceObject: {fileID: 100012, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7562588768165580072}
     - targetCorrespondingSourceObject: {fileID: 100000, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2031174014}
@@ -1316,6 +1319,22 @@ MonoBehaviour:
   playerHasKey: 0
   StarsCollected: 0
   shieldManager: {fileID: 0}
+--- !u!114 &7562588768165580072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3448052657569951258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6fc6b1f70c1a4907a8724f02e744364, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeartsManager
+  AS: {fileID: 0}
+  CollectableAS: {fileID: 0}
+  saveDataManager: {fileID: 0}
+  inputHandler: {fileID: 0}
 --- !u!1 &3448052657569951260 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100010, guid: add1d5ea65b47174dbb5a9ddb4535708, type: 3}
