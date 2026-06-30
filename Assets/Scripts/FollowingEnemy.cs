@@ -14,7 +14,7 @@ using UnityEngine.Serialization;
 //
 // All movement happens on the XY plane (z is locked to the spawn position),
 // so it works in any level without a baked NavMesh.
-public class FollowingEnemy : MonoBehaviour, IEnemyObservable
+public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettable
 {
     enum State { Patrol, Chase, ReturnDelay }
 
@@ -381,6 +381,22 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable
             hasCaughtPlayer = true;
             playerCollisionHandler.StartCrashSequence();
         }
+    }
+
+    // Respawn: return to the guard post, reset to a fresh patrol, and re-arm the catch.
+    public void ResetToSpawn()
+    {
+        transform.position = homePosition;
+        facingDir = homeFacing;
+        state = State.Patrol;
+        waypointIndex = 0;
+        waypointStep = 1;
+        waypointWaitTimer = 0f;
+        lostSightTimer = 0f;
+        patrolStuckTimer = 0f;
+        bestWaypointDistance = Mathf.Infinity;
+        hasCaughtPlayer = false;
+        ApplyVisionLight(patrolColor);
     }
 
     // ---------------------------------------------------------------- Helpers

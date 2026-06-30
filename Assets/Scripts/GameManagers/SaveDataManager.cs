@@ -66,6 +66,12 @@ public class SaveDataManager : Singleton<SaveDataManager>
         currentCollectedStars = 0;
     }
 
+    // Used by the checkpoint memento to restore the running star total to an absolute value.
+    public void SetCollectedStars(int amount)
+    {
+        currentCollectedStars = Mathf.Clamp(amount, 0, 3);
+    }
+
     public void Reset()
     {
         gameData = new GameData();

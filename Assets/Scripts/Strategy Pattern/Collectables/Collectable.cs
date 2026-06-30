@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Collectable<T> : MonoBehaviour where T : UIManager
+public abstract class Collectable<T> : MonoBehaviour, ICheckpointable where T : UIManager
 {
     [SerializeField] protected ParticleSystem ExplosionEffect;
 
@@ -23,10 +23,28 @@ public abstract class Collectable<T> : MonoBehaviour where T : UIManager
             ParticleSystem effect = Instantiate(ExplosionEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
             var main = effect.main;
             Destroy(effect.gameObject, main.duration + main.startLifetime.constantMax);
-            Destroy(gameObject);
+
+            // Deactivate instead of Destroy so a checkpoint respawn can bring the
+            // collectible back if it was collected after the checkpoint was reached.
+            gameObject.SetActive(false);
         }
     }
 
     protected abstract void Collect(T manager);
+
+    // Memento Pattern: a collectible's only checkpointed state is whether it is still
+    // present (active) in the world at the moment the checkpoint snapshot was taken.
+    public virtual object CaptureState()
+    {
+        return gameObject.activeSelf;
+    }
+
+    public virtual void RestoreState(object memento)
+    {
+        if (memento is bool active)
+        {
+            gameObject.SetActive(active);
+        }
+    }
 }
 

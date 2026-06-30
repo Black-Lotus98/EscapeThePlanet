@@ -40,6 +40,10 @@ public class CustomTeleporter : MonoBehaviour
 	//without disabling the entire script, so receiving objects still works
 	public bool teleportPadOn = true;
 
+	//When true, arriving at this pad registers it as the active checkpoint. Leave on for
+	//checkpoint teleporters; turn off for purely transport pads that shouldn't checkpoint.
+	public bool actsAsCheckpoint = true;
+
 	//set by the on-screen teleport button (wired up in DisplayTeleportBtn) to request a button-teleport.
 	//Replaces the old legacy/CrossPlatformInput polling so it works with the new Input System on touch.
 	private bool buttonTeleportRequested;
@@ -193,6 +197,13 @@ public class CustomTeleporter : MonoBehaviour
 
 	void OnTriggerEnter(Collider trig)
 	{
+		//Checkpoint hook: if this pad was flagged as a teleport DESTINATION ('arrived'),
+		//the player is now arriving here, so make this pad the active checkpoint.
+		if(actsAsCheckpoint && arrived && trig.CompareTag("Player") && CheckpointManager.Instance != null)
+		{
+			CheckpointManager.Instance.ActivateCheckpoint(transform, gameObject);
+		}
+
 		//when an object enters the trigger
 		//if you set a tag in the inspector, check if an object has that tag
 		//otherwise the pad will take in and teleport any object

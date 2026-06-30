@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class FuelManager : UIManager, IUIObservable<FuelManager>
+public class FuelManager : UIManager, IUIObservable<FuelManager>, ICheckpointable
 {
     [Header("Fuel Settings")]
     [SerializeField] private bool isUsingFuel = false;
@@ -123,5 +123,27 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>
         // Using the * refillSpeed to make the refill depend on how fast the player is refilling
         FuelAmount += Time.deltaTime * refillSpeed;
         isUsingFuel = true;
+    }
+
+    // Memento Pattern: snapshot/restore the fuel level at a checkpoint.
+    private class FuelMemento
+    {
+        public float amount;
+        public bool usingFuel;
+    }
+
+    public object CaptureState()
+    {
+        return new FuelMemento { amount = fuelAmount, usingFuel = isUsingFuel };
+    }
+
+    public void RestoreState(object memento)
+    {
+        if (memento is FuelMemento fuelMemento)
+        {
+            fuelAmount = Mathf.Clamp(fuelMemento.amount, 0, maxFlightTime);
+            isUsingFuel = fuelMemento.usingFuel;
+            NotifyObservers(UIState.FuelChanged);
+        }
     }
 }

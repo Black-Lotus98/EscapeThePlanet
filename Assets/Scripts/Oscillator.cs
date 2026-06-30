@@ -16,7 +16,7 @@ using UnityEngine;
 //'openOffset' is authored like 'movementsVector' - a relative offset from the start
 // position - and defaults to it (see Reset), so a new obstacle pulls aside along the
 // same axis it travels; flip/adjust it per obstacle to point at the clear side.
-public class Oscillator : MonoBehaviour, IEnemyObserver
+public class Oscillator : MonoBehaviour, IEnemyObserver, IRespawnResettable
 {
     Vector3 StartingPosition;
     [SerializeField] Vector3 movementsVector;
@@ -88,6 +88,15 @@ public class Oscillator : MonoBehaviour, IEnemyObserver
         {
             nearbyEnemies.Remove(enemy);
         }
+    }
+
+    // Respawn: snap back to the authored start and reset the oscillation clock.
+    public void ResetToSpawn()
+    {
+        phaseTime = 0f;
+        blend = 1f;
+        nearbyEnemies.Clear();
+        transform.position = StartingPosition;
     }
 
     void Update()

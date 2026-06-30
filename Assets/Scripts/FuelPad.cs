@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FuelPad : MonoBehaviour
+public class FuelPad : MonoBehaviour, ICheckpointable
 {
     public float refillAmount;
     float refillSpeed;
@@ -111,5 +111,22 @@ public class FuelPad : MonoBehaviour
         // Stop playing audio when refilling stops and disable looping
         AS.loop = false;
         AS.Stop();
+    }
+
+    // Memento Pattern: a fuel pad's depleting reserve is checkpointed; on respawn it
+    // returns to its checkpoint-time amount and goes idle (the player is repositioned).
+    public object CaptureState()
+    {
+        return refillAmount;
+    }
+
+    public void RestoreState(object memento)
+    {
+        if (memento is float amount)
+        {
+            refillAmount = amount;
+            StopFuelRefill();
+            ChangeState(new IdleState());
+        }
     }
 }

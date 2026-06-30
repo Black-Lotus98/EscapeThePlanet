@@ -129,13 +129,52 @@ public class CollisionHandler : MonoBehaviour
         AS.PlayOneShot(Explosion);
         ExplosionParticles.Play();
         if (inputHandler != null) inputHandler.enabled = false;
-        numberOfDeaths++;
-        if (!isTutorial)
+
+        if (isTutorial)
         {
-            UpdateDataOnLosing();
-            SaveProgress();
+            // Tutorials are exempt from checkpoints/stats: just reload.
+            Invoke("ReloadLevel", delayTime);
+            return;
         }
-        Invoke("ReloadLevel", delayTime);
+
+        if (CheckpointManager.Instance == null)
+        {
+            // Non-checkpoint level: a death counts and reloads from the start.
+            RegisterDeath();
+            Invoke("ReloadLevel", delayTime);
+            return;
+        }
+
+        // Checkpoint level: defer to the respawn flow. A checkpoint respawn (revive
+        // attempt) does NOT count as a death; only a true game-over does (see DoRespawn).
+        Invoke(nameof(DoRespawn), delayTime);
+    }
+
+    void DoRespawn()
+    {
+        bool respawned = CheckpointManager.Instance.OnPlayerDied();
+        if (respawned)
+        {
+            // Attempt consumed - NOT counted as a death.
+            ExplosionParticles.Stop();
+            if (inputHandler != null) inputHandler.enabled = true;
+            isTransitioning = false;
+            CollisionDisabled = false;
+        }
+        else
+        {
+            // Out of revives: the run truly failed -> count one death. CheckpointManager
+            // has shown the Game-Over panel (or restarted the level via fallback).
+            RegisterDeath();
+        }
+    }
+
+    // Persists a single death to the stats (per-level + total + saved counter).
+    void RegisterDeath()
+    {
+        numberOfDeaths++;
+        UpdateDataOnLosing();
+        SaveProgress();
     }
 
     public void StartSuccessSequence()
@@ -179,9 +218,13 @@ public class CollisionHandler : MonoBehaviour
 
     }
 
-    public void ActivateCheckpoint()
+    public void ActivateCheckpoint(Transform checkpointTransform)
     {
-        Debug.Log($"Checkpoint activated");
+        if (isTutorial) return;
+        if (CheckpointManager.Instance != null && checkpointTransform != null)
+        {
+            CheckpointManager.Instance.ActivateCheckpoint(checkpointTransform, checkpointTransform.gameObject);
+        }
     }
 
 

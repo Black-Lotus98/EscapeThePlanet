@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyCannon : MonoBehaviour
-{ 
+public class EnemyCannon : MonoBehaviour, IRespawnResettable
+{
     [SerializeField] GameObject BulletPrefab;
     
     [SerializeField] Transform MuzzleTransform;
@@ -40,6 +40,12 @@ public class EnemyCannon : MonoBehaviour
         Rigidbody rb = Bullet.GetComponent<Rigidbody>();
         if (rb != null)
             rb.linearVelocity = MuzzleTransform.forward * BulletSpeed;
+    }
+
+    // Respawn: reset the firing cooldown (live bullets are cleared by the CheckpointManager).
+    public void ResetToSpawn()
+    {
+        CurrentCooldown = BulletDelay;
     }
 
 }

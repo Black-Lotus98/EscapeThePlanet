@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ShieldManager : UIManager, IUIObservable<ShieldManager>
+public class ShieldManager : UIManager, IUIObservable<ShieldManager>, ICheckpointable
 {
     [Header("Shield Settings")]
     [SerializeField] private bool shieldAllowed = false;
@@ -151,5 +151,40 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>
         
         currentShieldTime += amount;
         NotifyObservers(UIState.ShieldChanged);
+    }
+
+    // Memento Pattern: snapshot/restore the shield charge and active state at a checkpoint.
+    private class ShieldMemento
+    {
+        public float time;
+        public bool allowed;
+        public bool active;
+        public bool shieldObjectActive;
+    }
+
+    public object CaptureState()
+    {
+        return new ShieldMemento
+        {
+            time = currentShieldTime,
+            allowed = shieldAllowed,
+            active = shieldIsActive,
+            shieldObjectActive = shield != null && shield.activeSelf,
+        };
+    }
+
+    public void RestoreState(object memento)
+    {
+        if (memento is ShieldMemento shieldMemento)
+        {
+            currentShieldTime = shieldMemento.time;
+            shieldAllowed = shieldMemento.allowed;
+            shieldIsActive = shieldMemento.active;
+            if (shield != null)
+            {
+                shield.SetActive(shieldMemento.shieldObjectActive);
+            }
+            NotifyObservers(UIState.ShieldChanged);
+        }
     }
 }

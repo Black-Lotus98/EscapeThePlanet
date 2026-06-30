@@ -6,6 +6,6 @@ public class CheckpointState : MonoBehaviour, CollisionState
 {
     public void Handle(CollisionHandler context)
     {
-        context.ActivateCheckpoint();
+        context.ActivateCheckpoint(transform);
     }
 }

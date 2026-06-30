@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class StarsManager : UIManager, IUIObservable<StarsManager>
+public class StarsManager : UIManager, IUIObservable<StarsManager>, ICheckpointable
 {
     [Header("Star Settings")]
     [SerializeField] private AudioClip starCollectableSound;
@@ -104,6 +104,39 @@ public class StarsManager : UIManager, IUIObservable<StarsManager>
             {
                 Debug.LogWarning("Null observer found in StarsManager observers list!");
             }
+        }
+    }
+
+    // Memento Pattern: snapshot/restore collected-star count at a checkpoint. Captures
+    // both the in-scene counter and the SaveDataManager running total, and restores them
+    // to absolute values so a respawn never double-counts.
+    private class StarsMemento
+    {
+        public int counter;
+        public int savedTotal;
+    }
+
+    public object CaptureState()
+    {
+        SaveDataManager sdm = saveDataManager != null ? saveDataManager : SaveDataManager.Instance;
+        return new StarsMemento
+        {
+            counter = collectedStarsCounter,
+            savedTotal = sdm != null ? sdm.GetCollectedStars() : 0,
+        };
+    }
+
+    public void RestoreState(object memento)
+    {
+        if (memento is StarsMemento starsMemento)
+        {
+            collectedStarsCounter = starsMemento.counter;
+            SaveDataManager sdm = saveDataManager != null ? saveDataManager : SaveDataManager.Instance;
+            if (sdm != null)
+            {
+                sdm.SetCollectedStars(starsMemento.savedTotal);
+            }
+            NotifyObservers(UIState.StarsState);
         }
     }
 }
