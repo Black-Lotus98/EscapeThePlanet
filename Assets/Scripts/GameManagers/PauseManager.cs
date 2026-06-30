@@ -53,12 +53,23 @@ public class PauseManager : MonoBehaviour
 
     private void AutoAssignUIReferences()
     {
-        // Find the Canvas in the scene (should be the prefab)
-        gameCanvas = FindObjectOfType<Canvas>();
-        
+        // A scene may contain more than one Canvas (e.g. the minimap canvas),
+        // so pick the one that actually hosts the pause UI rather than the
+        // first arbitrary Canvas returned by the engine.
+        gameCanvas = null;
+        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (Canvas canvas in canvases)
+        {
+            if (canvas.transform.Find("PauseMenu") != null)
+            {
+                gameCanvas = canvas;
+                break;
+            }
+        }
+
         if (gameCanvas == null)
         {
-            Debug.LogError("Canvas not found in scene!");
+            Debug.LogError("No Canvas containing a 'PauseMenu' child was found in the scene!");
             return;
         }
 

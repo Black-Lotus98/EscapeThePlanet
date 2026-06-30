@@ -239,7 +239,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -23, y: 43, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9219326611664851387}
@@ -322,7 +322,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.4
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &9219326611836510163
 MonoBehaviour:
@@ -337,19 +337,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waypoints: []
-  waypointRadius: 0.5
+  waypointRadius: 1
   waypointPause: 1
   pingPong: 0
   visionRange: 10
-  visionAngle: 90
+  visionAngle: 60
   obstacleMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  patrolSpeed: 2
-  chaseSpeed: 5
-  turnSpeed: 360
+  patrolSpeed: 3
+  chaseSpeed: 3
+  turnSpeed: 180
   returnToPatrolDelay: 3
-  attackRange: 1.5
+  attackRange: 1.2
   visionLight: {fileID: 886820012176248365}
   patrolColor: {r: 0.2, g: 0.9, b: 1, a: 1}
   chaseColor: {r: 1, g: 0, b: 0, a: 1}

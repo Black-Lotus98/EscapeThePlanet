@@ -14,7 +14,7 @@ using UnityEngine.Serialization;
 //
 // All movement happens on the XY plane (z is locked to the spawn position),
 // so it works in any level without a baked NavMesh.
-public class FollowingEnemy : MonoBehaviour
+public class FollowingEnemy : MonoBehaviour, IEnemyObservable
 {
     enum State { Patrol, Chase, ReturnDelay }
 
@@ -44,11 +44,19 @@ public class FollowingEnemy : MonoBehaviour
     [Tooltip("How fast the vision direction turns toward its target, in degrees/second.")]
     [SerializeField] float turnSpeed = 360f;
 
+    [Header("Wall Avoidance")]
+    [Tooltip("How far ahead (world units) to look for walls while moving. Larger = reacts earlier.")]
+    [SerializeField] float avoidLookAhead = 4f;
+    [Tooltip("Radius of the 'feeler' used to detect walls. Roughly the body's half-width; keeps the enemy this far off walls.")]
+    [SerializeField] float avoidRadius = 1.5f;
+
     [Header("Behaviour")]
     [Tooltip("Seconds the enemy waits (stopped) after losing sight before returning to patrol.")]
     [SerializeField] float returnToPatrolDelay = 3f;
     [Tooltip("If the player gets this close, it is caught (triggers the crash sequence).")]
     [SerializeField] float attackRange = 1.5f;
+    [Tooltip("While patrolling, if the enemy can't get any closer to its target waypoint for this many seconds (e.g. wall-avoidance has boxed it into a dead end), it gives up and moves on to the next waypoint.")]
+    [SerializeField] float patrolStuckTimeout = 1.5f;
 
     [Header("Feedback (optional)")]
     [SerializeField] Light visionLight;
@@ -66,6 +74,8 @@ public class FollowingEnemy : MonoBehaviour
     int waypointStep = 1;              // direction of travel for ping-pong
     float waypointWaitTimer = 0f;
     float lostSightTimer = 0f;
+    float patrolStuckTimer = 0f;       // time spent unable to approach the current waypoint
+    float bestWaypointDistance = Mathf.Infinity; // closest we've gotten to the current waypoint
     float planeZ;                      // z is locked to the spawn position
     float lightForwardOffset;          // distance from center to the enemy's front (for the vision light)
     Vector3 homePosition;              // guard post (used by stationary, waypoint-less sentries)
@@ -106,16 +116,55 @@ public class FollowingEnemy : MonoBehaviour
 
     void Update()
     {
-        if (player == null) return;
-
-        switch (state)
+        if (player != null)
         {
-            case State.Patrol: UpdatePatrol(); break;
-            case State.Chase: UpdateChase(); break;
-            case State.ReturnDelay: UpdateReturnDelay(); break;
+            switch (state)
+            {
+                case State.Patrol: UpdatePatrol(); break;
+                case State.Chase: UpdateChase(); break;
+                case State.ReturnDelay: UpdateReturnDelay(); break;
+            }
+
+            TryCatchPlayer();
         }
 
-        TryCatchPlayer();
+        // Observer Pattern: let obstacles react to this enemy's patrol each frame.
+        NotifyObservers();
+    }
+
+    // ----------------------------------------------------- Observer (subject)
+
+    private readonly List<IEnemyObserver> observers = new List<IEnemyObserver>();
+
+    public void AddObserver(IEnemyObserver observer)
+    {
+        if (!observers.Contains(observer))
+        {
+            observers.Add(observer);
+        }
+    }
+
+    public void RemoveObserver(IEnemyObserver observer)
+    {
+        if (observers.Contains(observer))
+        {
+            observers.Remove(observer);
+        }
+    }
+
+    public void NotifyObservers()
+    {
+        foreach (var observer in observers)
+        {
+            if (observer != null)
+            {
+                observer.OnEnemyMoved(this);
+            }
+            else
+            {
+                Debug.LogWarning("Null observer found in FollowingEnemy observers list!");
+            }
+        }
     }
 
     // ---------------------------------------------------------------- States
@@ -127,8 +176,9 @@ public class FollowingEnemy : MonoBehaviour
         if (!HasWaypoints()) { ReturnToPost(); return; } // stationary sentry
 
         Vector3 target = waypoints[waypointIndex].position;
+        float dist = DistanceInPlane(target);
 
-        if (DistanceInPlane(target) <= waypointRadius)
+        if (dist <= waypointRadius)
         {
             waypointWaitTimer += Time.deltaTime;
             if (waypointWaitTimer >= waypointPause)
@@ -137,6 +187,23 @@ public class FollowingEnemy : MonoBehaviour
                 AdvanceWaypoint();
             }
             return;
+        }
+
+        // If wall-avoidance has boxed us into a dead end and we can't get any
+        // closer to this waypoint for a while, skip it so patrol never locks up.
+        if (dist < bestWaypointDistance - 0.1f)
+        {
+            bestWaypointDistance = dist;
+            patrolStuckTimer = 0f;
+        }
+        else
+        {
+            patrolStuckTimer += Time.deltaTime;
+            if (patrolStuckTimer >= patrolStuckTimeout)
+            {
+                AdvanceWaypoint();
+                return;
+            }
         }
 
         MoveTowards(target, patrolSpeed);
@@ -173,6 +240,8 @@ public class FollowingEnemy : MonoBehaviour
         {
             state = State.Patrol;
             waypointWaitTimer = 0f;
+            bestWaypointDistance = Mathf.Infinity; // we likely moved far during the chase
+            patrolStuckTimer = 0f;
             ApplyVisionLight(patrolColor);
         }
     }
@@ -198,15 +267,60 @@ public class FollowingEnemy : MonoBehaviour
     {
         Vector3 target = new Vector3(worldTarget.x, worldTarget.y, planeZ);
 
-        Vector3 desired = DirInPlane(target - transform.position, facingDir);
-        facingDir = Vector3.RotateTowards(facingDir, desired, Mathf.Deg2Rad * turnSpeed * Time.deltaTime, 0f);
+        Vector3 toTarget = DirInPlane(target - transform.position, facingDir);
+        Vector3 moveDir = AvoidWalls(toTarget);
 
-        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+        // Face the actual direction of travel; if boxed in, keep aiming at the target.
+        Vector3 faceDir = moveDir.sqrMagnitude > 0.0001f ? moveDir : toTarget;
+        facingDir = Vector3.RotateTowards(facingDir, faceDir, Mathf.Deg2Rad * turnSpeed * Time.deltaTime, 0f);
+
+        if (moveDir.sqrMagnitude > 0.0001f)
+        {
+            float step = Mathf.Min(speed * Time.deltaTime, DistanceInPlane(target));
+            Vector3 pos = transform.position + moveDir * step;
+            transform.position = new Vector3(pos.x, pos.y, planeZ); // keep z locked to the spawn plane
+        }
+
         AimVisionLight();
+    }
+
+    // Steer around solid walls on the XY plane. Returns a clear direction close to
+    // 'desiredDir', or Vector3.zero when every probed direction is blocked (boxed in).
+    Vector3 AvoidWalls(Vector3 desiredDir)
+    {
+        if (obstacleMask.value == 0) return desiredDir;   // configured to move through walls
+        if (PathClear(desiredDir)) return desiredDir;
+
+        // Try progressively wider angles to either side and take the first clear one.
+        float[] probeAngles = { 25f, -25f, 50f, -50f, 75f, -75f, 100f, -100f, 130f, -130f };
+        foreach (float a in probeAngles)
+        {
+            Vector3 candidate = Quaternion.Euler(0f, 0f, a) * desiredDir; // rotate within the XY plane
+            if (PathClear(candidate)) return candidate;
+        }
+        return Vector3.zero; // surrounded — hold position this frame
+    }
+
+    // True if a feeler swept along 'dir' hits no solid wall (ignores self, the player, and triggers).
+    bool PathClear(Vector3 dir)
+    {
+        var hits = Physics.SphereCastAll(transform.position, avoidRadius, dir, avoidLookAhead,
+                                         obstacleMask, QueryTriggerInteraction.Ignore);
+        foreach (var h in hits)
+        {
+            Transform ht = h.collider.transform;
+            if (ht == transform || ht.IsChildOf(transform)) continue;          // ignore self
+            if (player != null && (ht == player || ht.IsChildOf(player))) continue; // the player isn't a wall
+            return false;
+        }
+        return true;
     }
 
     void AdvanceWaypoint()
     {
+        bestWaypointDistance = Mathf.Infinity; // fresh progress tracking for the new target
+        patrolStuckTimer = 0f;
+
         if (pingPong)
         {
             int next = waypointIndex + waypointStep;
