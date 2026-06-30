@@ -57,12 +57,17 @@ public class PauseManager : MonoBehaviour
         // so pick the one that actually hosts the pause UI rather than the
         // first arbitrary Canvas returned by the engine.
         gameCanvas = null;
+        Transform pauseMenuT = null;
         Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (Canvas canvas in canvases)
         {
-            if (canvas.transform.Find("PauseMenu") != null)
+            // Search descendants (not just direct children) so a SafeArea wrapper
+            // or other nesting under the Canvas doesn't hide the pause UI.
+            Transform found = FindDeep(canvas.transform, "PauseMenu");
+            if (found != null)
             {
                 gameCanvas = canvas;
+                pauseMenuT = found;
                 break;
             }
         }
@@ -74,20 +79,34 @@ public class PauseManager : MonoBehaviour
         }
 
         // Find PauseMenu within the Canvas
-        pauseMenuObj = gameCanvas.transform.Find("PauseMenu")?.gameObject;
+        pauseMenuObj = pauseMenuT != null ? pauseMenuT.gameObject : null;
         if (pauseMenuObj == null)
         {
             Debug.LogError("PauseMenu not found in Canvas!");
         }
 
         // Find HowToPlayPanel within the Canvas
-        howToPlayPanel = gameCanvas.transform.Find("HowToPlayPanel")?.gameObject;
+        Transform howToPlayT = FindDeep(gameCanvas.transform, "HowToPlayPanel");
+        howToPlayPanel = howToPlayT != null ? howToPlayT.gameObject : null;
         if (howToPlayPanel == null)
         {
             Debug.LogError("HowToPlayPanel not found in Canvas!");
         }
 
         // Debug.Log("UI references auto-assigned successfully!");
+    }
+
+    // Depth-first search for a descendant by name (handles nesting like a SafeArea wrapper).
+    private static Transform FindDeep(Transform parent, string name)
+    {
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+            if (child.name == name) return child;
+            Transform result = FindDeep(child, name);
+            if (result != null) return result;
+        }
+        return null;
     }
 
     public void ExitToMainMenu()
