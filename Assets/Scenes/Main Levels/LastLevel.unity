@@ -5230,6 +5230,7 @@ MonoBehaviour:
   teleportSound: {fileID: 549658}
   teleportPadSound: {fileID: 549657}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &549663
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -5351,6 +5352,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &96088026
 GameObject:
   m_ObjectHideFlags: 0
@@ -10521,6 +10525,7 @@ MonoBehaviour:
   teleportSound: {fileID: 148775752}
   teleportPadSound: {fileID: 148775751}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &148775757
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -15885,6 +15890,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &225201383
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18127,6 +18135,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 5
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &387019994 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 757145447256107665, guid: db8dd5d80df25ef4ebade175be213b2f, type: 3}
@@ -23259,6 +23270,7 @@ MonoBehaviour:
   teleportSound: {fileID: 429037570}
   teleportPadSound: {fileID: 429037569}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &429037575
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -23379,6 +23391,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &449272901
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23555,6 +23570,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 5
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &507990535 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 757145447256107665, guid: db8dd5d80df25ef4ebade175be213b2f, type: 3}
@@ -28950,6 +28968,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &580695598
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37748,6 +37769,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &677565375
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38125,6 +38149,7 @@ GameObject:
   - component: {fileID: 756188236}
   - component: {fileID: 756188238}
   - component: {fileID: 756188239}
+  - component: {fileID: 756188240}
   m_Layer: 0
   m_Name: GameMaster
   m_TagString: GameMaster
@@ -38274,6 +38299,18 @@ MonoBehaviour:
   isPaused: 0
   pauseMenuObj: {fileID: 0}
   howToPlayPanel: {fileID: 0}
+--- !u!114 &756188240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756188235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 133fedafa5f1844a7bd25c483607cbce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CheckpointManager
 --- !u!43 &785664436
 Mesh:
   m_ObjectHideFlags: 0
@@ -38478,6 +38515,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &842766295
 GameObject:
   m_ObjectHideFlags: 0
@@ -43590,6 +43630,7 @@ MonoBehaviour:
   teleportSound: {fileID: 842766299}
   teleportPadSound: {fileID: 842766298}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &842766304
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -48811,6 +48852,7 @@ MonoBehaviour:
   teleportSound: {fileID: 843748823}
   teleportPadSound: {fileID: 843748822}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &843748828
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -54249,6 +54291,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 6.25
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &975804843 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 757145447256107665, guid: db8dd5d80df25ef4ebade175be213b2f, type: 3}
@@ -54280,6 +54325,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &1004464215
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -59550,6 +59598,7 @@ MonoBehaviour:
   teleportSound: {fileID: 1072432437}
   teleportPadSound: {fileID: 1072432436}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &1072432442
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -64950,6 +64999,7 @@ MonoBehaviour:
   teleportSound: {fileID: 1087786051}
   teleportPadSound: {fileID: 1087786050}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &1087786056
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -70285,6 +70335,7 @@ MonoBehaviour:
   teleportSound: {fileID: 1153668504}
   teleportPadSound: {fileID: 1153668503}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &1153668509
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -70439,7 +70490,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1289931028
 GameObject:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -70458,7 +70509,7 @@ GameObject:
   m_IsActive: 1
 --- !u!4 &1289931029
 Transform:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -70473,7 +70524,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1289931030
 MonoBehaviour:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -70516,7 +70567,7 @@ MonoBehaviour:
   m_MaximumOrthoSize: 5000
 --- !u!114 &1289931031
 MonoBehaviour:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -70543,7 +70594,7 @@ MonoBehaviour:
   m_CenterOnActivate: 1
 --- !u!114 &1289931032
 MonoBehaviour:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -71199,6 +71250,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 7
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1565087593
 GameObject:
   m_ObjectHideFlags: 0
@@ -76353,6 +76407,7 @@ MonoBehaviour:
   teleportSound: {fileID: 1595410108}
   teleportPadSound: {fileID: 1595410107}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &1595410113
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -76739,6 +76794,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 6.5
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &1710460373 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 757145447256107665, guid: db8dd5d80df25ef4ebade175be213b2f, type: 3}
@@ -81855,6 +81913,7 @@ MonoBehaviour:
   teleportSound: {fileID: 1820328610}
   teleportPadSound: {fileID: 1820328609}
   teleportPadOn: 1
+  actsAsCheckpoint: 1
 --- !u!136 &1820328615
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -82375,7 +82434,7 @@ Transform:
   m_GameObject: {fileID: 1983756130}
   serializedVersion: 2
   m_LocalRotation: {x: 0.13052616, y: 0, z: 0, w: 0.9914449}
-  m_LocalPosition: {x: -3.500358, y: 41, z: -15.999999}
+  m_LocalPosition: {x: -3.557423, y: 41.000004, z: -15.999999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -82411,12 +82470,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 10
   OutputChannel: 1
   StandbyUpdate: 2
-  m_StreamingVersion: 20170927
-  m_LegacyPriority: 10
+  m_StreamingVersion: 20241001
+  m_LegacyPriority: 0
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 1004464220}
   m_Lens:
@@ -82460,7 +82519,7 @@ Transform:
   m_GameObject: {fileID: 2078518677}
   serializedVersion: 2
   m_LocalRotation: {x: 0.13052616, y: 0, z: 0, w: 0.9914449}
-  m_LocalPosition: {x: -3.500358, y: 41, z: -15.999999}
+  m_LocalPosition: {x: -3.557423, y: 41.000004, z: -15.999999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -82488,6 +82547,9 @@ MonoBehaviour:
   movementsFactor: 0
   period: 6
   fullcycles: 0
+  enemyFreezeRadius: 7
+  freezeBlendTime: 0.3
+  openOffset: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

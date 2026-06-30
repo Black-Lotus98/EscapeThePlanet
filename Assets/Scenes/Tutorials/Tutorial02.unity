@@ -125,7 +125,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1998824518}
+    m_TransformParent: {fileID: 1440193731}
     m_Modifications:
     - target: {fileID: 7498894066258840520, guid: 7d306e941748e204fabd6d148ac23ca3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -760,10 +760,10 @@ PrefabInstance:
     - {fileID: 8446351846956676784, guid: 11ae44928db9d4747b7cbfe0d9df4b1e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 3643987980365445209, guid: 11ae44928db9d4747b7cbfe0d9df4b1e, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 3131795972124401814, guid: 11ae44928db9d4747b7cbfe0d9df4b1e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 405459068}
-    - targetCorrespondingSourceObject: {fileID: 3643987980365445209, guid: 11ae44928db9d4747b7cbfe0d9df4b1e, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 3131795972124401814, guid: 11ae44928db9d4747b7cbfe0d9df4b1e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2042741630}
     m_AddedComponents:
@@ -1076,6 +1076,11 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaIndirect: 2
   m_PVRFilteringAtrousPositionSigmaAO: 1
   m_RespectSceneVisibilityWhenBakingGI: 0
+--- !u!224 &1440193731 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3131795972124401814, guid: 11ae44928db9d4747b7cbfe0d9df4b1e, type: 3}
+  m_PrefabInstance: {fileID: 566594768}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1481329572
 GameObject:
   m_ObjectHideFlags: 0
@@ -2848,18 +2853,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!224 &1998824518 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 3643987980365445209, guid: 11ae44928db9d4747b7cbfe0d9df4b1e, type: 3}
-  m_PrefabInstance: {fileID: 566594768}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2042741629
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1998824518}
+    m_TransformParent: {fileID: 1440193731}
     m_Modifications:
     - target: {fileID: 1436007008517410034, guid: c24eb84cbab2d994595ec382a546811a, type: 3}
       propertyPath: m_Pivot.x
