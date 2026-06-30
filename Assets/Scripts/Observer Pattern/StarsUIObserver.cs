@@ -8,7 +8,9 @@ public class StarsUIObserver : MonoBehaviour, IUIObserver<StarsManager>
     [Header("UI References")]
     [SerializeField] private Image[] starImages;
     [SerializeField] private Sprite collectedStar;
-    
+    [Tooltip("Optional: sprite for an uncollected star (so a checkpoint respawn can revert filled stars).")]
+    [SerializeField] private Sprite uncollectedStar;
+
     private StarsManager starsManager;
     private bool isRegistered = false;
 
@@ -75,10 +77,25 @@ public class StarsUIObserver : MonoBehaviour, IUIObserver<StarsManager>
 
         try
         {
+            int collected = starsManager.CollectedStarsCounter;
+
+            // When an uncollected sprite is provided, repaint the whole row so a
+            // checkpoint respawn can revert stars back to uncollected.
+            if (uncollectedStar != null)
+            {
+                for (int i = 0; i < starImages.Length; i++)
+                {
+                    if (starImages[i] != null)
+                    {
+                        starImages[i].sprite = i < collected ? collectedStar : uncollectedStar;
+                    }
+                }
+                return;
+            }
+
+            // Legacy behavior: just fill the most recently collected star.
             // The -1 here because the array index starts from 0 while the star ID starts from 1
-            int starId = starsManager.CollectedStarsCounter - 1;
-            
-            // Validate array bounds
+            int starId = collected - 1;
             if (starId >= 0 && starId < starImages.Length)
             {
                 if (starImages[starId] != null)

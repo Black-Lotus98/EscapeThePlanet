@@ -8,7 +8,9 @@ public class KeyUIObserver : MonoBehaviour, IUIObserver<KeyManager>
     [Header("UI References")]
     [SerializeField] private Image keyImage;
     [SerializeField] private Sprite collectedKey;
-    
+    [Tooltip("Optional: sprite shown when the key is NOT held (so a checkpoint respawn can revert the icon).")]
+    [SerializeField] private Sprite uncollectedKey;
+
     private KeyManager keyManager;
     private bool isRegistered = false;
 
@@ -79,6 +81,11 @@ public class KeyUIObserver : MonoBehaviour, IUIObserver<KeyManager>
             if (keyManager.PlayerHasKey)
             {
                 keyImage.sprite = collectedKey;
+            }
+            else if (uncollectedKey != null)
+            {
+                // Revert on a checkpoint respawn that restores a key-less state.
+                keyImage.sprite = uncollectedKey;
             }
         }
         catch (System.Exception e)

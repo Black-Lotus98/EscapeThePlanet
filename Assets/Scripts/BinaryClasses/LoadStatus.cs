@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-// this script must be attached to the game master object and then to be referenced in the Performance panel 
+// this script must be attached to the game master object and then to be referenced in the Performance panel
 public class LoadStatus : MonoBehaviour
 {
-    [SerializeField] Text NumberOfDeathsText;
-    [SerializeField] Text LastLevelReachedText;
+    [SerializeField] TextMeshProUGUI NumberOfDeathsText;
+    [SerializeField] TextMeshProUGUI LastLevelReachedText;
 
     public void LoadProgress()
     {

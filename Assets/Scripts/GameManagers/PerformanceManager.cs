@@ -62,14 +62,14 @@ public class PerformanceManager : MonoBehaviour
             GameObject levelStatItem = Instantiate(levelStats, statsListContent);
             
             // Find and update level name text
-            var levelNameText = levelStatItem.transform.Find("LevelNameText")?.GetComponent<Text>();
+            var levelNameText = levelStatItem.transform.Find("LevelNameText")?.GetComponent<TMP_Text>();
             if (levelNameText != null)
             {
                 levelNameText.text = $"Level {levelData.currentLevelIndex} Deaths: ";
             }
-            
+
             // Find and update deaths text
-            var deathsText = levelStatItem.transform.Find("DeathsText")?.GetComponent<Text>();
+            var deathsText = levelStatItem.transform.Find("DeathsText")?.GetComponent<TMP_Text>();
             if (deathsText != null)
             {
                 deathsText.text = levelData.numberOfDeaths.ToString();
