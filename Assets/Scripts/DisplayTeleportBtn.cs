@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DisplayTeleportBtn : MonoBehaviour
 {
@@ -21,6 +22,13 @@ public class DisplayTeleportBtn : MonoBehaviour
         if (other.CompareTag("Player") && teleportPad.enabled)
         {
             teleportBtn.TPBtn.SetActive(true);
+            // Route the shared on-screen button to THIS pad while the player stands on it.
+            Button btn = teleportBtn.TPBtn.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick.RemoveListener(teleportPad.TeleportNow); // guard against duplicate listeners
+                btn.onClick.AddListener(teleportPad.TeleportNow);
+            }
         }
     }
 
@@ -28,6 +36,11 @@ public class DisplayTeleportBtn : MonoBehaviour
     {
         if (other.CompareTag("Player") && teleportPad.enabled)
         {
+            Button btn = teleportBtn.TPBtn.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick.RemoveListener(teleportPad.TeleportNow);
+            }
             teleportBtn.TPBtn.SetActive(false);
         }
     }

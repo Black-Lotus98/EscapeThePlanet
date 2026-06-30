@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 using DG.Tweening;
 using TMPro;
 public class DoorTrigger : MonoBehaviour
@@ -120,7 +121,8 @@ public class DoorTrigger : MonoBehaviour
 
     void DoorController()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        // New Input System: Keyboard.current is null on devices without a keyboard (e.g. mobile), so guard it.
+        if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
         {
             if (DoorIsOpen)
             {

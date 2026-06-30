@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keyImage: {fileID: 263814782582017055}
-  collectedKey: {fileID: 0}
+  collectedKey: {fileID: 21300000, guid: f147c2b287d910b48b2b66e50ce64283, type: 3}
 --- !u!1 &263814783420984703
 GameObject:
   m_ObjectHideFlags: 0

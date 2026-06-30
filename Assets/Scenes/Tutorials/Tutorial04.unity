@@ -345,7 +345,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &460926447
 GameObject:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -364,7 +364,7 @@ GameObject:
   m_IsActive: 1
 --- !u!4 &460926448
 Transform:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -379,7 +379,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &460926449
 MonoBehaviour:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -401,7 +401,7 @@ MonoBehaviour:
   m_AngularDamping: 0
 --- !u!114 &460926450
 MonoBehaviour:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -428,7 +428,7 @@ MonoBehaviour:
   m_CenterOnActivate: 1
 --- !u!114 &460926451
 MonoBehaviour:
-  m_ObjectHideFlags: 3
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -5238,8 +5238,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44abed52a94332443ad324091999a41f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyImage: {fileID: 0}
-  collectedKey: {fileID: 0}
+  keyImage: {fileID: 6106402037928346112}
+  collectedKey: {fileID: 21300000, guid: f147c2b287d910b48b2b66e50ce64283, type: 3}
 --- !u!224 &6307947601624025344
 RectTransform:
   m_ObjectHideFlags: 0

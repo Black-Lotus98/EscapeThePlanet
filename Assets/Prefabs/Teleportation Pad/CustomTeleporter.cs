@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using UnityStandardAssets.CrossPlatformInput;
 
 public class CustomTeleporter : MonoBehaviour
 {
@@ -40,6 +39,16 @@ public class CustomTeleporter : MonoBehaviour
 	//simple enable/disable function in case you want the teleport not working at some point
 	//without disabling the entire script, so receiving objects still works
 	public bool teleportPadOn = true;
+
+	//set by the on-screen teleport button (wired up in DisplayTeleportBtn) to request a button-teleport.
+	//Replaces the old legacy/CrossPlatformInput polling so it works with the new Input System on touch.
+	private bool buttonTeleportRequested;
+
+	//Called by the on-screen teleport button's onClick (UI EventSystem - works for touch and mouse).
+	public void TeleportNow()
+	{
+		buttonTeleportRequested = true;
+	}
 
 	void Start ()
 	{
@@ -120,9 +129,10 @@ public class CustomTeleporter : MonoBehaviour
 		}
 		else if(buttonTeleport) //if you selected a teleport activated by a button
 		{
-			//checks if the button you set in the inspector is being pressed
-			if(Input.GetButtonDown(buttonName) || CrossPlatformInputManager.GetButtonDown(buttonName))
+			//teleport when the on-screen button (DisplayTeleportBtn -> TeleportNow) has requested it
+			if(buttonTeleportRequested)
 			{
+				buttonTeleportRequested = false;
 				if(delayedTeleport) //if you set it to button + delayed
 				{
 					//start the countdown
