@@ -64,6 +64,14 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
     [SerializeField] Color chaseColor = Color.red;
     [SerializeField] AudioClip detectionSound;
 
+    [Header("Body Visuals (optional)")]
+    [Tooltip("Visible body pivot; rotated so its +Z (the drone's nose) faces the vision direction.")]
+    [SerializeField] Transform bodyPivot;
+    [Tooltip("Renderer whose colour/emission mirrors the vision light (cyan patrol / red chase).")]
+    [SerializeField] Renderer eyeRenderer;
+    [Tooltip("Emission intensity of the eye tint.")]
+    [SerializeField] float eyeEmissionIntensity = 2.2f;
+
     State state = State.Patrol;
     AudioSource audioSource;
     Transform player;
@@ -423,6 +431,7 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
 
     void ApplyVisionLight(Color color)
     {
+        TintEye(color);
         if (visionLight == null) return;
         visionLight.type = LightType.Spot;
         visionLight.spotAngle = visionAngle;
@@ -434,11 +443,32 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
 
     void AimVisionLight()
     {
+        AimBody();
         if (visionLight == null) return;
         // Keep the light at the body centre and just point it along the facing direction;
         // its extended range (set in ApplyVisionLight) projects the cone past the body.
         visionLight.transform.position = transform.position;
         visionLight.transform.rotation = Quaternion.LookRotation(facingDir, Vector3.forward);
+    }
+
+    // Turn the visible body so its nose follows the vision direction.
+    void AimBody()
+    {
+        if (bodyPivot == null) return;
+        // facingDir always lies in the XY plane, so world +Z is a safe 'up' (matches the light).
+        bodyPivot.rotation = Quaternion.LookRotation(facingDir, Vector3.forward);
+    }
+
+    // Tint the eye renderer (lens, beacon, exhausts) to match the vision light state.
+    MaterialPropertyBlock eyeBlock;
+    void TintEye(Color color)
+    {
+        if (eyeRenderer == null) return;
+        if (eyeBlock == null) eyeBlock = new MaterialPropertyBlock();
+        eyeRenderer.GetPropertyBlock(eyeBlock);
+        eyeBlock.SetColor("_Color", color);
+        eyeBlock.SetColor("_EmissionColor", color * eyeEmissionIntensity);
+        eyeRenderer.SetPropertyBlock(eyeBlock);
     }
 
     void OnDrawGizmosSelected()
