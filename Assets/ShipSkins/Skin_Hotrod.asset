@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d50410d0dde37dd45b8aaf92d6333e07, type: 3}
+  m_Name: Skin_Hotrod
+  m_EditorClassIdentifier: Assembly-CSharp::ShipSkin
+  id: hotrod
+  displayName: HOT-ROD HAULER
+  factory: {fileID: 11400000, guid: 8ef58d787425e7049b62ab0dcc746f4e, type: 2}
+  previewFactory: {fileID: 0}
+  colorOptions:
+  - {fileID: 11400000, guid: 116f860211e40964eb7f90dba7cc5933, type: 2}
+  - {fileID: 11400000, guid: 60fc86a221c2a0941a3c17fc21927ac7, type: 2}
+  - {fileID: 11400000, guid: 2ff976f376039e1459ef54dca14f5e69, type: 2}
+  unlockMode: 0
+  unlockThreshold: 0

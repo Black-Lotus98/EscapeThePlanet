@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbf85903b4e50548a96961f660a7334, type: 3}
+  m_Name: ShipCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::ShipCatalog
+  skins:
+  - {fileID: 11400000, guid: 0c089cd50bdfd2a4abb5d2ed9cd534c9, type: 2}
+  - {fileID: 11400000, guid: 328b6d52e8c7774449a2fb2119b5191d, type: 2}
+  - {fileID: 11400000, guid: b35e49ea9bc22a04a8446bd1450f1dd9, type: 2}
+  - {fileID: 11400000, guid: 1b4df427646e0624aa91142308c32a2f, type: 2}
+  - {fileID: 11400000, guid: 73fe2c6f0b56d9f45a8d5b1d0ef1dbb9, type: 2}
