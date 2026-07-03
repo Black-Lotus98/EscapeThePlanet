@@ -122,6 +122,9 @@ InitTestScene*.unity*
 
 # OS junk
 .DS_Store
+._*
+.AppleDouble
+.LSOverride
 Thumbs.db
 ehthumbs.db
 Desktop.ini
@@ -130,6 +133,9 @@ Desktop.ini
 /.vscode/
 
 /.cursor/
+
+# Claude Code local session data
+/.claude/projects/
 
 # --- Project-specific ---
 # Local secrets / credentials
