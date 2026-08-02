@@ -14,7 +14,7 @@ using UnityEngine.Serialization;
 //
 // All movement happens on the XY plane (z is locked to the spawn position),
 // so it works in any level without a baked NavMesh.
-public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettable
+public partial class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettable
 {
     enum State { Patrol, Chase, ReturnDelay }
 
@@ -122,10 +122,19 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
         ApplyVisionLight(patrolColor);
     }
 
+    float EffectiveVisionRange { get { return DifficultyRuntime.VisionRange(visionRange); } }
+    float EffectiveVisionAngle { get { return DifficultyRuntime.VisionAngle(visionAngle); } }
+
     void Update()
     {
         if (player != null)
         {
+            if (visionLight != null)
+            {
+                visionLight.spotAngle = EffectiveVisionAngle;
+                visionLight.range = EffectiveVisionRange + lightForwardOffset;
+            }
+
             switch (state)
             {
                 case State.Patrol: UpdatePatrol(); break;
@@ -234,7 +243,7 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
             return;
         }
 
-        MoveTowards(player.position, chaseSpeed);
+        MoveTowards(player.position, DifficultyRuntime.ChaseSpeed(chaseSpeed));
     }
 
     void UpdateReturnDelay()
@@ -352,8 +361,8 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
         Vector3 toPlayer = DirInPlane(player.position - transform.position, facingDir);
         float dist = DistanceInPlane(player.position);
 
-        if (dist > visionRange) return false;
-        if (Vector3.Angle(facingDir, toPlayer) > visionAngle * 0.5f) return false;
+        if (dist > EffectiveVisionRange) return false;
+        if (Vector3.Angle(facingDir, toPlayer) > EffectiveVisionAngle * 0.5f) return false;
         if (!HasLineOfSight()) return false;
 
         return true;
@@ -383,11 +392,18 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
 
     void TryCatchPlayer()
     {
-        if (hasCaughtPlayer || playerCollisionHandler == null) return;
+        if (playerCollisionHandler == null) return;
+
+        if (hasCaughtPlayer)
+        {
+            if (DistanceInPlane(player.position) > attackRange * 1.5f) hasCaughtPlayer = false;
+            return;
+        }
+
         if (DistanceInPlane(player.position) <= attackRange)
         {
             hasCaughtPlayer = true;
-            playerCollisionHandler.StartCrashSequence();
+            playerCollisionHandler.TakeHazardHit();
         }
     }
 
@@ -434,9 +450,9 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
         TintEye(color);
         if (visionLight == null) return;
         visionLight.type = LightType.Spot;
-        visionLight.spotAngle = visionAngle;
+        visionLight.spotAngle = EffectiveVisionAngle;
         // Reach past the (possibly large) body so the cone lands on walls beyond it.
-        visionLight.range = visionRange + lightForwardOffset;
+        visionLight.range = EffectiveVisionRange + lightForwardOffset;
         visionLight.color = color;
         AimVisionLight();
     }
@@ -471,19 +487,4 @@ public class FollowingEnemy : MonoBehaviour, IEnemyObservable, IRespawnResettabl
         eyeRenderer.SetPropertyBlock(eyeBlock);
     }
 
-    void OnDrawGizmosSelected()
-    {
-        // In play mode show the real facing; in the editor approximate it with +X.
-        Vector3 f = (Application.isPlaying && facingDir.sqrMagnitude > 0.0001f) ? facingDir : Vector3.right;
-
-        Gizmos.color = Color.yellow;
-        Vector3 left = Quaternion.Euler(0f, 0f, visionAngle * 0.5f) * f;
-        Vector3 right = Quaternion.Euler(0f, 0f, -visionAngle * 0.5f) * f;
-        Gizmos.DrawRay(transform.position, left * visionRange);
-        Gizmos.DrawRay(transform.position, right * visionRange);
-        Gizmos.DrawWireSphere(transform.position, visionRange);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-    }
 }

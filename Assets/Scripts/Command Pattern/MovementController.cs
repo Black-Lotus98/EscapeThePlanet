@@ -21,7 +21,11 @@ public class MovementController : MonoBehaviour
             enabled = false;
             return;
         }
-        
+
+        Rigidbdy.constraints = RigidbodyConstraints.FreezePositionZ
+                             | RigidbodyConstraints.FreezeRotationX
+                             | RigidbodyConstraints.FreezeRotationY;
+
         if (AS == null)
         {
             Debug.LogWarning("AudioSource component not found on MovementController GameObject.");

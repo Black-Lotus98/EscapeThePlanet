@@ -18,7 +18,7 @@ public class EnemyCannon : MonoBehaviour, IRespawnResettable
     private void Start()
     {
         AS = gameObject.GetComponent<AudioSource>();
-        CurrentCooldown = BulletDelay;
+        CurrentCooldown = DifficultyRuntime.BulletDelay(BulletDelay);
     }
 
     private void Update()
@@ -27,7 +27,7 @@ public class EnemyCannon : MonoBehaviour, IRespawnResettable
         if (CurrentCooldown <= 0f)
         {
             shootingProcess();
-            CurrentCooldown = BulletDelay;
+            CurrentCooldown = DifficultyRuntime.BulletDelay(BulletDelay);
         }
     }
     void shootingProcess()
@@ -39,13 +39,13 @@ public class EnemyCannon : MonoBehaviour, IRespawnResettable
 
         Rigidbody rb = Bullet.GetComponent<Rigidbody>();
         if (rb != null)
-            rb.linearVelocity = MuzzleTransform.forward * BulletSpeed;
+            rb.linearVelocity = MuzzleTransform.forward * DifficultyRuntime.BulletSpeed(BulletSpeed);
     }
 
     // Respawn: reset the firing cooldown (live bullets are cleared by the CheckpointManager).
     public void ResetToSpawn()
     {
-        CurrentCooldown = BulletDelay;
+        CurrentCooldown = DifficultyRuntime.BulletDelay(BulletDelay);
     }
 
 }

@@ -2,18 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Memento Pattern - Caretaker. A SCENE-SCOPED component (place on the GameMaster
-// object). Because it is not DontDestroyOnLoad, re-entering a level creates a fresh
-// manager, so checkpoint progress never survives leaving the level (matches the design:
-// in-scene only, resets on exit-to-menu).
-//
-// Responsibilities:
-//  - Discover every ICheckpointable / IRespawnResettable in the scene at the first
-//    frame (all are still active then) and cache references (so they can be restored
-//    even after being deactivated when collected).
-//  - Capture a snapshot when a checkpoint is first activated (capture-once per source).
-//  - On death, decrement attempts and either respawn (restore snapshot + reset hazards
-//    + reposition the player) or trigger Game-Over when revives run out.
 public class CheckpointManager : MonoBehaviour
 {
     public static CheckpointManager Instance { get; private set; }
@@ -23,23 +11,24 @@ public class CheckpointManager : MonoBehaviour
 
     private readonly Dictionary<ICheckpointable, object> snapshot = new Dictionary<ICheckpointable, object>();
 
-    // Capture-once guard: checkpoint sources (pad GameObjects) that have already fired.
     private readonly HashSet<object> activatedSources = new HashSet<object>();
 
     private Vector3 respawnPosition;
     private Quaternion respawnRotation;
-    private Quaternion baselineRotation = Quaternion.identity; // launch orientation, reused for safe upright respawns
+    private Quaternion baselineRotation = Quaternion.identity;
     private bool hasSnapshot = false;
 
-    private int maxAttempts;
     private int currentAttempts;
 
     private GameObject player;
     private Rigidbody playerBody;
+    private PlayerIntegrity playerIntegrity;
     private HeartsManager heartsManager;
     private GameOverController gameOverController;
 
-    public bool IsUnlimited { get { return maxAttempts == DifficultyManager.Unlimited; } }
+    private int MaxAttempts { get { return DifficultyManager.MaxAttemptsFor(DifficultyManager.Current); } }
+
+    public bool IsUnlimited { get { return MaxAttempts == DifficultyManager.Unlimited; } }
 
     private void Awake()
     {
@@ -56,14 +45,13 @@ public class CheckpointManager : MonoBehaviour
 
     private void Start()
     {
-        Difficulty difficulty = DifficultyManager.Current;
-        maxAttempts = DifficultyManager.MaxAttemptsFor(difficulty);
-        currentAttempts = maxAttempts;
+        currentAttempts = MaxAttempts;
 
         player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             playerBody = player.GetComponent<Rigidbody>();
+            playerIntegrity = player.GetComponent<PlayerIntegrity>();
         }
         heartsManager = FindObjectOfType<HeartsManager>();
         gameOverController = FindObjectOfType<GameOverController>();
@@ -83,7 +71,7 @@ public class CheckpointManager : MonoBehaviour
         {
             respawnPosition = player.transform.position;
             respawnRotation = player.transform.rotation;
-            baselineRotation = player.transform.rotation; // remember the upright launch orientation
+            baselineRotation = player.transform.rotation; 
         }
 
         CaptureSnapshot();
@@ -95,8 +83,7 @@ public class CheckpointManager : MonoBehaviour
         checkpointables.Clear();
         resettables.Clear();
 
-        // Active objects only (default). At baseline nothing is collected, so every
-        // collectible is still active and gets cached; later deactivation keeps the ref.
+       
         MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
         foreach (MonoBehaviour behaviour in behaviours)
         {
@@ -111,8 +98,7 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
-    // Called by CollisionHandler (CheckpointState pad) and CustomTeleporter (TP pad).
-    // 'source' identifies the checkpoint so it only captures once; re-touching does nothing.
+    
     public void ActivateCheckpoint(Transform checkpointTransform, object source)
     {
         if (source != null && activatedSources.Contains(source))
@@ -124,7 +110,6 @@ public class CheckpointManager : MonoBehaviour
             activatedSources.Add(source);
         }
 
-        // Visual feedback (e.g. a teleport pad turning blue) on first activation.
         if (source is GameObject sourceObject)
         {
             CheckpointVisual visual = sourceObject.GetComponent<CheckpointVisual>();
@@ -134,21 +119,24 @@ public class CheckpointManager : MonoBehaviour
             }
         }
 
-        // Respawn ON TOP of the pad's solid collider (centered, just clearing the surface)
-        // with the upright launch orientation. Using the pad's pivot/rotation spawned the
-        // player inside/below the tilted pad -> instant crash.
         respawnRotation = baselineRotation;
         respawnPosition = ComputeRespawnOnTop(checkpointTransform);
 
+        if (playerIntegrity == null && player != null)
+        {
+            playerIntegrity = player.GetComponent<PlayerIntegrity>();
+        }
+        if (playerIntegrity != null)
+        {
+            playerIntegrity.Refill();
+        }
+
         CaptureSnapshot();
 
-        // Reaching a new checkpoint refills revive attempts.
-        currentAttempts = maxAttempts;
+        currentAttempts = MaxAttempts;
         RefreshHearts();
     }
 
-    // Returns a point centered on top of the checkpoint pad's solid collider, raised so the
-    // player's own collider clears the surface (so respawn never lands inside/below the pad).
     private Vector3 ComputeRespawnOnTop(Transform checkpointTransform)
     {
         if (checkpointTransform == null)
@@ -156,7 +144,6 @@ public class CheckpointManager : MonoBehaviour
             return player != null ? player.transform.position : respawnPosition;
         }
 
-        // The pad's solid (non-trigger) collider.
         Collider padCollider = null;
         foreach (Collider c in checkpointTransform.GetComponentsInChildren<Collider>())
         {
@@ -167,7 +154,6 @@ public class CheckpointManager : MonoBehaviour
             return checkpointTransform.position + Vector3.up * 2f;
         }
 
-        // Clearance = the player's own collider half-height, so it rests just above the pad.
         float clearance = 0.5f;
         if (player != null)
         {
@@ -193,8 +179,6 @@ public class CheckpointManager : MonoBehaviour
         hasSnapshot = true;
     }
 
-    // Called from CollisionHandler when the player dies (non-tutorial scenes).
-    // Returns true if the player respawned, false if it was a Game-Over.
     public bool OnPlayerDied()
     {
         if (!IsUnlimited)
@@ -270,7 +254,7 @@ public class CheckpointManager : MonoBehaviour
             }
             else
             {
-                heartsManager.SetHearts(currentAttempts, maxAttempts);
+                heartsManager.SetHearts(currentAttempts, MaxAttempts);
             }
         }
     }
@@ -287,8 +271,6 @@ public class CheckpointManager : MonoBehaviour
         }
         else
         {
-            // Graceful fallback until a Game-Over panel is authored: restart the level
-            // from its true start (a fresh scene load resets attempts and checkpoint).
             Debug.LogWarning("CheckpointManager: no GameOverController found - restarting level.");
             UnityEngine.SceneManagement.SceneManager.LoadScene(
                 UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);

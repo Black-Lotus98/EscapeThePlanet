@@ -15,9 +15,14 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>, ICheckpoin
     
     private bool shieldIsActive = false;
 
+    private void Awake()
+    {
+        currentShieldTime = DifficultyRuntime.ShieldTime(currentShieldTime);
+    }
+
     public float ShieldMaxTime
     {
-        get { return shieldMaxTime; }
+        get { return DifficultyRuntime.ShieldTime(shieldMaxTime); }
     }
 
     public float CurrentShieldTime
@@ -35,7 +40,7 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>, ICheckpoin
 
     public bool ShieldAllowed
     {
-        get { return shieldAllowed; }
+        get { return shieldAllowed && !DifficultyRuntime.ShieldDisabled; }
     }
     
     public bool ShieldIsActive
@@ -45,7 +50,7 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>, ICheckpoin
 
     public void ToggleShield()
     {
-        if (!shieldAllowed || shield == null)
+        if (!ShieldAllowed || shield == null)
         {
             if (shield != null)
             {
@@ -149,7 +154,7 @@ public class ShieldManager : UIManager, IUIObservable<ShieldManager>, ICheckpoin
             CollectableAS.PlayOneShot(shieldCollectableSound);
         }
         
-        currentShieldTime += amount;
+        currentShieldTime += DifficultyRuntime.ShieldTime(amount);
         NotifyObservers(UIState.ShieldChanged);
     }
 

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 736a3b06f98ba574a9e6c6ba92125cc0, type: 3}
+  m_Name: DifficultyCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::DifficultyCatalog
+  profiles:
+  - {fileID: 11400000, guid: 1d979a67adfaf3946b593d64fa0d5b47, type: 2}
+  - {fileID: 11400000, guid: 3636eb5390d53274fbf673ec6524bc4f, type: 2}
+  - {fileID: 11400000, guid: c6f6a986e04ef1b45aa9b950361849a5, type: 2}

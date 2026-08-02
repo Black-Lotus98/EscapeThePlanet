@@ -18,6 +18,11 @@ public class CollisionHandler : MonoBehaviour
 
     SaveDataManager saveDataManager;
     InputHandler inputHandler;
+    PlayerIntegrity integrity;
+    ShieldManager shieldManager;
+    bool searchedForShield;
+    float hazardImmuneUntil;
+    int lastHazardHitFrame = -1;
 
     AudioSource AS;
 
@@ -28,6 +33,15 @@ public class CollisionHandler : MonoBehaviour
     static int numberOfDeaths = 0;
 
     // private CollisionState currentState;
+
+    void Awake()
+    {
+        integrity = GetComponent<PlayerIntegrity>();
+        if (integrity == null)
+        {
+            integrity = gameObject.AddComponent<PlayerIntegrity>();
+        }
+    }
 
     void Start()
     {
@@ -41,6 +55,7 @@ public class CollisionHandler : MonoBehaviour
         // we just use the word saveDataManager
         saveDataManager = SaveDataManager.Instance;
         inputHandler = GetComponent<InputHandler>();
+        shieldManager = FindObjectOfType<ShieldManager>();
 
         // Loading the data from the SaveDataManager
         GameData gameData = saveDataManager.Load();
@@ -92,12 +107,22 @@ public class CollisionHandler : MonoBehaviour
         if (state != null)
         {
             state.Handle(this);
+            return;
         }
-        else
+
+        if (IsHazard(other.gameObject))
         {
-            Debug.Log($"{other.gameObject.name} has no CollisionState");
-            StartCrashSequence();
+            if (ShieldIsBlocking())
+            {
+                if (other.gameObject.CompareTag("Bullet")) Destroy(other.gameObject);
+                return;
+            }
+            TakeHazardHit();
+            return;
         }
+
+        Debug.Log($"{other.gameObject.name} has no CollisionState");
+        StartCrashSequence();
 
         // the switch statement is not needed since we have a CollisionState that being attached to game objects
         // switch (other.gameObject.tag)
@@ -121,10 +146,74 @@ public class CollisionHandler : MonoBehaviour
 
     }
 
+    bool ShieldIsBlocking()
+    {
+        if (shieldManager == null && !searchedForShield)
+        {
+            searchedForShield = true;
+            shieldManager = FindObjectOfType<ShieldManager>();
+        }
+        return shieldManager != null && shieldManager.ShieldIsActive;
+    }
+
+    static bool IsHazard(GameObject other)
+    {
+        return other.CompareTag("Bullet")
+            || other.GetComponentInParent<FollowingEnemy>() != null
+            || other.GetComponentInParent<MovingEnemy>() != null;
+    }
+
+    public void TakeHazardHit()
+    {
+        if (isTransitioning || CollisionDisabled) return;
+        if (isTutorial)
+        {
+            StartCrashSequence();
+            return;
+        }
+        if (Time.frameCount == lastHazardHitFrame) return;
+        if (Time.time < hazardImmuneUntil) return;
+        if (ShieldIsBlocking()) return;
+
+        lastHazardHitFrame = Time.frameCount;
+
+        if (integrity == null || !integrity.Absorb())
+        {
+            StartCrashSequence();
+            return;
+        }
+
+        hazardImmuneUntil = Time.time + DifficultyManager.HitImmunityFor(DifficultyManager.Current);
+        PlayHazardHitFeedback();
+    }
+
+    void PlayHazardHitFeedback()
+    {
+        if (AS != null && Explosion != null)
+        {
+            AS.PlayOneShot(Explosion, 0.5f);
+        }
+        if (ExplosionParticles != null)
+        {
+            CancelInvoke(nameof(StopHazardHitParticles));
+            ExplosionParticles.Play();
+            Invoke(nameof(StopHazardHitParticles), 0.25f);
+        }
+    }
+
+    void StopHazardHitParticles()
+    {
+        if (ExplosionParticles != null)
+        {
+            ExplosionParticles.Stop();
+        }
+    }
+
     public void StartCrashSequence()
     {
 
         isTransitioning = true;
+        CancelInvoke(nameof(StopHazardHitParticles));
         AS.Stop();
         AS.PlayOneShot(Explosion);
         ExplosionParticles.Play();
@@ -160,6 +249,7 @@ public class CollisionHandler : MonoBehaviour
             if (inputHandler != null) inputHandler.enabled = true;
             isTransitioning = false;
             CollisionDisabled = false;
+            hazardImmuneUntil = 0f;
         }
         else
         {

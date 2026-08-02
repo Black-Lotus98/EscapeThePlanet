@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1846652b90a01846873e52b959f29c7, type: 3}
+  m_Name: Medium
+  m_EditorClassIdentifier: Assembly-CSharp::DifficultyProfile
+  difficulty: 1
+  maxIntegrity: 2
+  maxAttempts: 5
+  unlimitedAttempts: 0
+  hitImmunitySeconds: 1
+  levelIndexCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  inLevelCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  inLevelRampSeconds: 120
+  chaseSpeedScale: 1
+  visionRangeScale: 1
+  visionAngleScale: 1
+  bulletDelayScale: 1
+  bulletSpeedScale: 1
+  beamEnabled: 0
+  fuelCapacityScale: 1
+  fuelConsumptionScale: 1
+  shieldTimeScale: 1
+  disableShield: 0
+  thrustScale: 1
+  gravityScale: 1

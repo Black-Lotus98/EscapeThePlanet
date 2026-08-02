@@ -27,7 +27,7 @@ public class MoveUp : Command
         }
         
         // Apply movement force
-        rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed);
+        rigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * movementSpeed * DifficultyRuntime.ThrustScale);
         
         // Handle audio and particles
         HandleAudioAndParticles(audioSource);

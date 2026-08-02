@@ -17,19 +17,29 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>, ICheckpointabl
         get { return isUsingFuel; }
     }
 
+    private bool tankScaled;
+
     public float FuelAmount
     {
-        get { return fuelAmount; }
-        set 
-        { 
-            fuelAmount = Mathf.Clamp(value, 0, maxFlightTime);
+        get { EnsureTankScaled(); return fuelAmount; }
+        set
+        {
+            EnsureTankScaled();
+            fuelAmount = Mathf.Clamp(value, 0, MaxFlightTime);
             NotifyObservers(UIState.FuelChanged);
         }
     }
 
     public float MaxFlightTime
     {
-        get { return maxFlightTime; }
+        get { return DifficultyRuntime.FuelCapacity(maxFlightTime); }
+    }
+
+    private void EnsureTankScaled()
+    {
+        if (tankScaled) return;
+        tankScaled = true;
+        fuelAmount = DifficultyRuntime.FuelCapacity(fuelAmount);
     }
 
     private readonly List<IUIObserver<FuelManager>> observers = new List<IUIObserver<FuelManager>>();
@@ -78,7 +88,7 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>, ICheckpointabl
             return;
         }
 
-        FuelAmount -= amount * Time.deltaTime;
+        FuelAmount -= amount * DifficultyRuntime.FuelConsumption(1f) * Time.deltaTime;
     }
 
     public void FuelBarrel(int amount)
@@ -88,9 +98,9 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>, ICheckpointabl
             return;
         }
 
-        if (FuelAmount >= maxFlightTime)
+        if (FuelAmount >= MaxFlightTime)
         {
-            FuelAmount = maxFlightTime;
+            FuelAmount = MaxFlightTime;
             return;
         }
 
@@ -134,6 +144,7 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>, ICheckpointabl
 
     public object CaptureState()
     {
+        EnsureTankScaled();
         return new FuelMemento { amount = fuelAmount, usingFuel = isUsingFuel };
     }
 
@@ -141,7 +152,8 @@ public class FuelManager : UIManager, IUIObservable<FuelManager>, ICheckpointabl
     {
         if (memento is FuelMemento fuelMemento)
         {
-            fuelAmount = Mathf.Clamp(fuelMemento.amount, 0, maxFlightTime);
+            tankScaled = true;
+            fuelAmount = Mathf.Clamp(fuelMemento.amount, 0, MaxFlightTime);
             isUsingFuel = fuelMemento.usingFuel;
             NotifyObservers(UIState.FuelChanged);
         }

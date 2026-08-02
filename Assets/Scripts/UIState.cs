@@ -5,5 +5,6 @@ public enum UIState
     KeyState,
     StarsState,
     HeartsChanged,
+    IntegrityChanged,
 }
 

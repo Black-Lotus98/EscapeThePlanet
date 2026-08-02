@@ -21,17 +21,7 @@ public class RotateLeft : Command
 
     private void ApplyRotation(Rigidbody rigidbody, float rotation)
     {
-        // Cache transform reference for better performance
-        Transform transform = rigidbody.transform;
-        
-        // Lock Y rotation to prevent side-to-side movement, allow X and Z rotation
-        Vector3 currentRotation = transform.eulerAngles;
-        transform.rotation = Quaternion.Euler(currentRotation.x, 0, currentRotation.z);
-        
-        // Apply rotation using physics
-        rigidbody.freezeRotation = true;
-        transform.Rotate(Vector3.forward * Time.deltaTime * rotationSpeed * rotation);
-        rigidbody.freezeRotation = false;
+        rigidbody.transform.Rotate(Vector3.forward * Time.deltaTime * rotationSpeed * rotation);
     }
 
     private void PlayParticles()
